@@ -1,4 +1,1 @@
-.DS_Store
-web/node_modules
-web/dist/
-web/tsconfig.tsbuildinfo
+.DS_Store\nweb/node_modules\nweb/dist/\nweb/tsconfig.tsbuildinfo\n__pycache__/\n*.py[cod]\n.venv/\n/target/\n/dist/\n
