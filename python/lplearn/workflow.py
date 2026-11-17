@@ -77,6 +77,8 @@ def solve(config, method, backend):
     if method == "lp":
         result = solve_lp(build_lp(model))
         y = result["y"]
+        if not np.isfinite(y).all() or not np.isfinite(result["objective"]):
+            raise RuntimeError("CVXPY solver returned non-finite results")
         reported = result["solve_time"]
         metadata = {"solver": result["solver"], "status": result["status"],
                     "objective": result["objective"],
@@ -86,6 +88,11 @@ def solve(config, method, backend):
         if method == "gda":
             settings["samples_per_pair"] = 0
         result = run_gda(model, **settings)
+        # Every returned iterate, trace and diagnostic belongs to this run.
+        # Reject divergence even if the selected average happens to be finite.
+        for name, value in result.items():
+            if isinstance(value, (np.ndarray, float, np.floating)) and not np.isfinite(value).all():
+                raise RuntimeError(f"Numba solver returned non-finite values in {name}")
         y = result["y_avg"]
         metadata = {"seed": result["seed"], "iterations": result["n_iter"],
                     "samples_per_pair": result["samples_per_pair"], "averaged_iterations": result["n_avg"],

@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -70,6 +71,28 @@ class BaselineTests(unittest.TestCase):
             config.write_text('[model]\nK=2\nT=3\n[learning]\nsamples_per_pair=0\n')
             with self.assertRaisesRegex(ValueError, "SGDA requires"):
                 lplearn.solve(lplearn.load_config(config), "sgda", "numba")
+
+    def test_nonfinite_unselected_iterate_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            config = Path(temp) / "config.toml"
+            config.write_text('[model]\nK=2\nT=3\n')
+            fake = {"y_avg": np.zeros((3, 3, 4)), "lam_res_last": np.array([float("nan")])}
+            with patch("lplearn.workflow.run_gda", return_value=fake):
+                with self.assertRaisesRegex(RuntimeError, "non-finite.*lam_res_last"):
+                    lplearn.solve(lplearn.load_config(config), "gda", "numba")
+
+    def test_divergent_numba_solve_fails_without_output(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config, out = root / "config.toml", root / "output.npz"
+            config.write_text('[model]\nK=2\nT=3\n[learning]\n'
+                              'eta_y=1e308\nn_iter=4\navg_window=4\nrecord_every=1\n')
+            proc = subprocess.run([sys.executable, "-m", "lplearn", "solve", "--config", str(config),
+                                   "--method", "gda", "--backend", "numba", "--output", str(out)],
+                                  text=True, capture_output=True, timeout=180)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("non-finite", proc.stderr)
+            self.assertFalse(out.exists())
 
 
 if __name__ == "__main__":
