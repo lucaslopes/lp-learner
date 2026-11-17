@@ -4,6 +4,8 @@ The initial `lplearn` Python package provides a diagnostic bridge to a Rust
 backend. The first software release is `0.1.0`; this bootstrap reports backend
 identity only and does not solve a policy. See
 [installation and usage](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md).
+The Python baseline can also solve a configured model using CVXPY or Numba;
+see [the single-job workflow](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md).
 
 ## Authors
 - S.R. Eshwar
