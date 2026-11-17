@@ -13,4 +13,3 @@ license = { file = "LICENSE" }
 bindings = "bin"
 python-source = "python"
 module-name = "lplearn"
-sdist-generator = "git"
