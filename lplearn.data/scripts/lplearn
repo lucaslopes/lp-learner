@@ -1,0 +1,4 @@
+#!python
+from lplearn.cli import main
+
+raise SystemExit(main())

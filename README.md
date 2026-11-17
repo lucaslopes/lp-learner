@@ -1,5 +1,10 @@
 # Online Learning of Weakly Coupled MDP Policies for Load Balancing and Auto Scaling
 
+The initial `lplearn` Python package provides a diagnostic bridge to a Rust
+backend. The first software release is `0.1.0`; this bootstrap reports backend
+identity only and does not solve a policy. See
+[installation and usage](docs/python-rust-bridge.md).
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe

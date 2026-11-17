@@ -1,0 +1,15 @@
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "lplearn"
+version = "0.1.0"
+description = "Python interface for weakly coupled MDP policy learning"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+
+[tool.maturin]
+bindings = "bin"
+python-source = "python"
+module-name = "lplearn"
