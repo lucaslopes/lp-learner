@@ -42,8 +42,11 @@ class BaselineTests(unittest.TestCase):
                                        "--method", "sgda", "--backend", "numba", "--output", str(out)],
                                       text=True, capture_output=True, timeout=180)
                 self.assertEqual(proc.returncode, 0, proc.stderr)
-                self.assertIn(str(out), proc.stdout)
                 self.assertTrue(out.is_file())
+                reported = next(line.removeprefix("Occupation measures: ")
+                                 for line in proc.stdout.splitlines()
+                                 if line.startswith("Occupation measures: "))
+                self.assertTrue(Path(reported).samefile(out))
                 with np.load(out, allow_pickle=False) as saved:
                     arrays.append(saved["occupation"])
                     self.assertEqual(json.loads(str(saved["config_json"]))["model"]["case"], "SJS")
