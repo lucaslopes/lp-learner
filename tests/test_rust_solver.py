@@ -65,7 +65,7 @@ class RustSolverTests(unittest.TestCase):
                             self.assertIs(metadata["backend_debug_assertions"], False)
                             self.assertGreaterEqual(metadata["backend_process_seconds"],
                                                     metadata["solver_reported_seconds"])
-                        np.testing.assert_allclose(results["rust"], results["numba"], rtol=2e-11, atol=2e-11)
+                np.testing.assert_allclose(results["rust"], results["numba"], rtol=2e-11, atol=2e-11)
 
     def test_solver_failure_and_timeout_never_fall_back(self):
         with tempfile.TemporaryDirectory() as temp:
