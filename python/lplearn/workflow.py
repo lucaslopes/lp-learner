@@ -61,9 +61,10 @@ def load_config(path):
     return {"model": asdict(params), "learning": defaults}
 
 
-def solve(config, method, backend):
+def solve(config, method, backend, *, rust_timeout=30.0):
     """Return occupation measures y[t,s,u] and metadata for a single job."""
-    if (method, backend) not in {("lp", "cvxpy"), ("gda", "numba"), ("sgda", "numba")}:
+    if (method, backend) not in {("lp", "cvxpy"), ("gda", "numba"), ("sgda", "numba"),
+                                  ("gda", "rust"), ("sgda", "rust")}:
         raise ValueError(f"unsupported method/backend combination: {method}/{backend}")
     if method == "sgda" and config["learning"]["samples_per_pair"] < 1:
         raise ValueError("SGDA requires a positive samples_per_pair")
@@ -87,17 +88,27 @@ def solve(config, method, backend):
         settings = dict(config["learning"])
         if method == "gda":
             settings["samples_per_pair"] = 0
-        result = run_gda(model, **settings)
-        # Every returned iterate, trace and diagnostic belongs to this run.
-        # Reject divergence even if the selected average happens to be finite.
+        if backend == "rust":
+            from .rust import run_gda as native_run_gda
+            result = native_run_gda(model, **settings, timeout=rust_timeout)
+        else:
+            result = run_gda(model, **settings)
+        # Reject divergence in any returned iterate, trace or diagnostic.
         for name, value in result.items():
             if isinstance(value, (np.ndarray, float, np.floating)) and not np.isfinite(value).all():
-                raise RuntimeError(f"Numba solver returned non-finite values in {name}")
+                raise RuntimeError(f"{backend} solver returned non-finite values in {name}")
         y = result["y_avg"]
         metadata = {"seed": result["seed"], "iterations": result["n_iter"],
-                    "samples_per_pair": result["samples_per_pair"], "averaged_iterations": result["n_avg"],
-                    "solver_reported_seconds": result["wall_time"],
-                    "solver_timing_scope": "Numba _run including any JIT compilation"}
+                    "samples_per_pair": result["samples_per_pair"], "averaged_iterations": result["n_avg"]}
+        if backend == "rust":
+            metadata.update(solver_reported_seconds=result["execute_seconds"],
+                            solver_timing_scope="Rust execution including model and solver setup",
+                            backend_process_seconds=result["wall_time"],
+                            backend_version=result["backend_version"],
+                            backend_debug_assertions=result["debug_assertions"])
+        else:
+            metadata.update(solver_reported_seconds=result["wall_time"],
+                            solver_timing_scope="Numba _run including any JIT compilation")
     return np.asarray(y, dtype=float), {"method": method, "backend": backend,
                                       "model_seconds": model_seconds,
                                       "solve_seconds": perf_counter() - start, **metadata}

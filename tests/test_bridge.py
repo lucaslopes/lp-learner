@@ -26,7 +26,7 @@ class BridgeTests(unittest.TestCase):
             self.assertEqual(result["schema"], "lplearn-bridge/1")
             self.assertEqual(result["backend"], "rust")
             self.assertEqual(result["command"], command)
-            self.assertEqual(result["capabilities"], [])
+            self.assertEqual(result["capabilities"], ["gda", "sgda"])
             self.assertEqual(result["version"], metadata.version("lplearn"))
 
     def test_worker_rejects_bad_input(self):

@@ -1,14 +1,15 @@
-# lplearn bridge bootstrap
+# lplearn Python and Rust bridge
 
-This bootstrap proves that a Python CLI installed from a wheel can invoke a
-packaged Rust executable. It reports backend identity only; no solver or policy
-calculation is available yet.
+The Python package calls a packaged Rust executable for GDA and SGDA. The
+`backend` diagnostic reports the available capabilities separately from the
+solver interface.
 
-After the `0.1.0` release is published, install and check the diagnostic
-backend with:
+Download the wheel for your platform from the
+[versioned GitHub Releases](https://github.com/lucaslopes/lplearn/releases).
+With Python 3.12 and an activated virtual environment:
 
 ```sh
-python -m pip install lplearn==0.1.0
+python -m pip install /path/to/lplearn-wheel.whl
 lplearn --help
 lplearn backend ping
 ```
@@ -32,15 +33,13 @@ available through `import lplearn as lpl; lpl.backend_info()`.
 On Windows, the wheel includes an `lplearn.cmd` launcher for virtual
 environments and standard Python installations. For other installation
 layouts, run `python -m lplearn backend ping` using the Python interpreter
-into which the wheel was installed. Windows and Linux remain unverified until
-their CI jobs complete.
+into which the wheel was installed.
 
 The worker accepts a JSON object on stdin with schema `lplearn-bridge/1` and
-command `ping` or `info`. Its JSON reply identifies Rust, its version, and an
-empty capability list. Diagnostics go to stderr and errors return nonzero.
+command `ping` or `info`. Its JSON reply identifies Rust, its version, and its
+capability list. Diagnostics go to stderr and errors return nonzero. The Rust
+solver worker uses the separate `lpl-core/1` request/response protocol.
 
-Versioned releases use matching `vX.Y.Z` Git tags, Python package metadata,
-and Rust crate metadata. The tag workflow builds and checks platform wheels and
-an sdist, publishes through PyPI trusted publishing, then tests installation
-from PyPI on Linux, macOS and Windows. This first pre-1.0 release is
-experimental; solver capabilities will be added in later versions.
+Versioned releases use matching `vX.Y.Z` Git tags and Python and Rust package
+metadata. The tag workflow builds and installs the platform wheels and source
+distribution before it attaches them to the GitHub Release.
