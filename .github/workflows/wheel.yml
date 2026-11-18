@@ -7,7 +7,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15, windows-latest]
+        include:
+          - os: ubuntu-24.04
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: ubuntu-24.04-arm
+            python_arch: arm64
+            platform_suffix: aarch64
+          - os: macos-15-intel
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: macos-15
+            python_arch: arm64
+            platform_suffix: arm64
+          - os: windows-2025
+            python_arch: x64
+            platform_suffix: win-amd64
+          - os: windows-11-arm
+            python_arch: arm64
+            platform_suffix: win-arm64
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -17,11 +35,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          architecture: ${{ matrix.python_arch }}
+      - name: Verify Python target architecture
+        env:
+          EXPECTED_ARCH: ${{ matrix.python_arch }}
+        run: |
+          python - <<'PY'
+          import os
+          import platform
+
+          actual = platform.machine().lower()
+          expected = os.environ["EXPECTED_ARCH"]
+          aliases = {
+              "x64": {"x86_64", "amd64"},
+              "arm64": {"arm64", "aarch64"},
+          }
+          print("Python machine:", actual, "expected architecture:", expected)
+          raise SystemExit(0 if actual in aliases[expected] else 1)
+          PY
       - uses: dtolnay/rust-toolchain@stable
       - run: python -m pip install 'maturin>=1.9,<2'
       - run: maturin build --release --out dist
       - run: python -m pip install dist/*.whl
       - run: python -m pip install 'pytest>=8'
+      - run: python -m pip check
       - name: Test installed wheel
         env:
           WEB_WHEEL_CLI_TEST: "1"
@@ -50,6 +87,7 @@ jobs:
           python -m pip install 'build>=1,<2'
           python -m build --sdist --outdir dist
           python -m pip install --force-reinstall dist/*.tar.gz
+      - run: python -m pip check
       - name: Test installed source distribution
         env:
           WEB_WHEEL_CLI_TEST: "1"
@@ -68,9 +106,48 @@ jobs:
         timeout-minutes: 8
         run: python -m pytest -vv -o faulthandler_timeout=180 tests/test_tutorial_stage.py
       - run: python -m lplearn backend ping
-      - run: python -m pip check
       - if: runner.os != 'Windows'
         run: lplearn backend ping
       - if: runner.os == 'Windows'
         shell: cmd
         run: lplearn.cmd backend ping
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}-${{ matrix.python_arch }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  sdist:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install 'build>=1,<2' 'pytest>=8'
+      - run: python -m build --sdist --outdir dist
+      - run: python -m pip install dist/*.tar.gz
+      - run: python -m pip check
+      - name: Test installed source distribution
+        env:
+          WEB_WHEEL_CLI_TEST: "1"
+        timeout-minutes: 8
+        run: python -m unittest discover -s tests -v
+      - name: Test source distribution figures
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/pytest_figure_checks.py
+      - name: Test source distribution tutorial stage
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/test_tutorial_stage.py
+      - run: python -m lplearn backend ping
+      - run: lplearn backend ping

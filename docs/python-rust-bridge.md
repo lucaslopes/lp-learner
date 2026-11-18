@@ -4,12 +4,11 @@ The Python package calls a packaged Rust executable for GDA and SGDA. The
 `backend` diagnostic reports the available capabilities separately from the
 solver interface.
 
-Download the wheel for your platform from the
-[versioned GitHub Releases](https://github.com/lucaslopes/lplearn/releases).
-With Python 3.12 and an activated virtual environment:
+After the `0.1.0` release is published, install and check the diagnostic
+backend with:
 
 ```sh
-python -m pip install /path/to/lplearn-wheel.whl
+python -m pip install lplearn==0.1.0
 lplearn --help
 lplearn backend ping
 ```
@@ -30,16 +29,20 @@ Prebuilt wheels bundle the worker and need no Rust installation at runtime.
 Building from source requires a Rust toolchain. The Python interface is also
 available through `import lplearn as lpl; lpl.backend_info()`.
 
-On Windows, the wheel includes an `lplearn.cmd` launcher for virtual
-environments and standard Python installations. For other installation
-layouts, run `python -m lplearn backend ping` using the Python interpreter
-into which the wheel was installed.
+The wheel includes a native `lplearn` launcher that locates Python beside
+itself in a virtual environment and delegates to `python -m lplearn`. Set
+`LPLEARN_PYTHON` to select the interpreter for nonstandard installations. A
+Windows `lplearn.cmd` compatibility wrapper remains available. The release
+matrix checks the supported x64 and ARM64 Linux, macOS, and Windows targets.
 
 The worker accepts a JSON object on stdin with schema `lplearn-bridge/1` and
 command `ping` or `info`. Its JSON reply identifies Rust, its version, and its
 capability list. Diagnostics go to stderr and errors return nonzero. The Rust
 solver worker uses the separate `lpl-core/1` request/response protocol.
 
-Versioned releases use matching `vX.Y.Z` Git tags and Python and Rust package
-metadata. The tag workflow builds and installs the platform wheels and source
-distribution before it attaches them to the GitHub Release.
+Versioned releases use matching `vX.Y.Z` Git tags, Python package metadata,
+and Rust crate metadata. The tag workflow checks the supported platform wheels
+and sdist, then attaches those artifacts to a GitHub Release. TestPyPI upload
+and clean-install checks run separately through the `testpypi` environment;
+production PyPI publishing is not part of this release plan. Releases before
+`1.0.0` are experimental.

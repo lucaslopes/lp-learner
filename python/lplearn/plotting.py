@@ -104,6 +104,9 @@ def policy_pie_plot(occupation, *, feasibility=None, allow_infeasible=False):
 def plot_command(args):
     start = perf_counter()
     recover = getattr(args, "recover", False)
+    cvxpy_solver = getattr(args, "cvxpy_solver", "CLARABEL")
+    if recover and cvxpy_solver != "CLARABEL":
+        raise ValueError("--recover currently requires --cvxpy-solver CLARABEL")
     config_path = Path(args.config).expanduser().resolve()
     initial_config_hash = _sha256(config_path)
     fmt = args.format or (Path(args.output).suffix.lstrip(".").lower() if args.output else "png")
@@ -124,7 +127,8 @@ def plot_command(args):
         if os.path.lexists(candidate):
             raise FileExistsError(f"output artifact already exists: {candidate}; choose a new --output path")
     config = load_config(config_path)
-    occupation, timing = solve(config, args.method, args.backend, rust_timeout=args.rust_timeout)
+    occupation, timing = solve(config, args.method, args.backend, rust_timeout=args.rust_timeout,
+                               cvxpy_solver=cvxpy_solver)
     if _sha256(config_path) != initial_config_hash:
         raise ValueError("configuration changed during the solve")
     feasibility = timing["occupation_feasibility"]

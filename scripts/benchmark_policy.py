@@ -666,7 +666,8 @@ def progress_writer(root: Path, total: int, prior_elapsed: float, known_orphans:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--command", required=True, help="quoted installed CLI command, e.g. '/path/to/venv/bin/lplearn'")
+    parser.add_argument("--command", required=True,
+                        help="quoted installed CLI command, e.g. '/path/to/venv/bin/python -m lplearn'")
     parser.add_argument("--cwd", required=True, help="working directory for the CLI")
     parser.add_argument("--config", required=True)
     parser.add_argument("--case", action="append", type=parse_case, required=True, help="NAME:METHOD:BACKEND; repeat")

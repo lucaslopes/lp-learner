@@ -132,11 +132,15 @@ def recover_occupation(occupation, model, *, tolerance=1e-6):
     }
 
 
-def solve(config, method, backend, *, rust_timeout=30.0):
+def solve(config, method, backend, *, rust_timeout=30.0, cvxpy_solver="CLARABEL"):
     """Return occupation measures y[t,s,u] and metadata for a single job."""
     if (method, backend) not in {("lp", "cvxpy"), ("gda", "numba"), ("sgda", "numba"),
                                   ("gda", "rust"), ("sgda", "rust")}:
         raise ValueError(f"unsupported method/backend combination: {method}/{backend}")
+    if not isinstance(cvxpy_solver, str) or not cvxpy_solver.strip():
+        raise ValueError("cvxpy_solver must be a nonempty solver name")
+    if backend != "cvxpy" and cvxpy_solver != "CLARABEL":
+        raise ValueError("cvxpy_solver is only configurable for the cvxpy backend")
     if method == "sgda" and config["learning"]["samples_per_pair"] < 1:
         raise ValueError("SGDA requires a positive samples_per_pair")
     fields = dict(config["model"])
@@ -147,7 +151,7 @@ def solve(config, method, backend, *, rust_timeout=30.0):
     model_seconds = perf_counter() - start
     start = perf_counter()
     if method == "lp":
-        result = solve_lp(build_lp(model))
+        result = solve_lp(build_lp(model), solver=cvxpy_solver)
         y = result["y"]
         if not np.isfinite(y).all() or not np.isfinite(result["objective"]):
             raise RuntimeError("CVXPY solver returned non-finite results")

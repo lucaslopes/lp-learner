@@ -14,6 +14,38 @@ import numpy as np
 
 
 class PlotTests(unittest.TestCase):
+    def test_cli_records_explicit_cvxpy_solver_in_plot_manifest(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config = root / "config.toml"
+            output = root / "scipy.png"
+            config.write_text('[model]\nK=2\nT=3\ncase="CJS"\n')
+            proc = subprocess.run([sys.executable, "-m", "lplearn", "plot-policy",
+                                   "--config", str(config), "--method", "lp", "--backend", "cvxpy",
+                                   "--cvxpy-solver", "SCIPY", "--output", str(output)],
+                                  check=False, text=True, capture_output=True, timeout=180)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertTrue(output.is_file())
+            manifest = json.loads(output.with_suffix(".json").read_text())
+            self.assertEqual(manifest["solver"], "SCIPY")
+            self.assertTrue(manifest["occupation_feasibility"]["feasible"])
+
+    def test_alternate_cvxpy_solver_rejects_recovery_without_outputs(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config = root / "config.toml"
+            output = root / "scipy-recovered.png"
+            config.write_text('[model]\nK=2\nT=3\ncase="CJS"\n')
+            proc = subprocess.run([sys.executable, "-m", "lplearn", "plot-policy",
+                                   "--config", str(config), "--method", "lp", "--backend", "cvxpy",
+                                   "--cvxpy-solver", "SCIPY", "--recover", "--output", str(output)],
+                                  check=False, text=True, capture_output=True, timeout=30)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("--recover currently requires --cvxpy-solver CLARABEL", proc.stderr)
+            self.assertFalse(output.exists())
+            self.assertFalse(output.with_suffix(".npy").exists())
+            self.assertFalse(output.with_suffix(".json").exists())
+
     def test_cli_saves_plots_and_matched_rust_numba_occupations(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -39,6 +71,8 @@ class PlotTests(unittest.TestCase):
                 arrays[backend] = np.load(array_path, allow_pickle=False)
                 self.assertEqual(arrays[backend].shape, (3, 3, 4))
                 self.assertEqual(manifest["backend"], backend)
+                if backend == "cvxpy":
+                    self.assertEqual(manifest["solver"], "CLARABEL")
                 self.assertEqual(manifest["occupation_feasibility"]["feasible"], method == "lp")
                 self.assertEqual(manifest["plot_kind"], "occupation" if method == "lp" else "infeasible_iterate_diagnostic")
                 self.assertEqual(manifest["config_sha256"], hashlib.sha256(config.read_bytes()).hexdigest())

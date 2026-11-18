@@ -1,7 +1,7 @@
 # Online Learning of Weakly Coupled MDP Policies for Load Balancing and Auto Scaling
 
 The `lplearn` Python package provides a Rust learning backend.
-See [installation and usage](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md).
+See [installation and usage](docs/python-rust-bridge.md).
 Release `0.1.0` reports backend identity only; `0.2.0` adds single-configuration
 CVXPY/Numba solves; `0.3.0` adds GDA/SGDA on Rust; and `0.4.0` adds policy
 plots, feasibility checks and optional recovery; `0.5.0` adds reproducible,
@@ -10,13 +10,14 @@ restores the legacy `Model` and top-level API exports; `0.7.0` adds the
 resumable experiment runner and smoke stage; `0.8.0` adds LP-reference and
 learning experiment stages; `0.9.0` adds aggregation bounds, `0.10.0` adds
 finite-population experiments, `0.11.0` adds commons, and `0.12.0` adds
-manuscript tables, figures, tutorial assets and web data export. See
-[the single-job workflow and policy plots](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md).
+manuscript tables, figures, tutorial assets and web data export. Planned
+`0.13.0` qualifies dependency and release support across the target matrix. See
+[the single-job workflow and policy plots](docs/python-baseline.md).
 For reproducible CLI timing and policy comparisons, see the
-[benchmark protocol](https://github.com/lucaslopes/lplearn/blob/main/docs/benchmark-protocol.md).
+[benchmark protocol](docs/benchmark-protocol.md).
 For programs using the earlier Python API, see
-[legacy API compatibility](https://github.com/lucaslopes/lplearn/blob/main/docs/legacy-api.md).
-The resumable runner is described in [the experiment guide](https://github.com/lucaslopes/lplearn/blob/main/docs/experiments.md).
+[legacy API compatibility](docs/legacy-api.md).
+The resumable runner is described in [the experiment guide](docs/experiments.md).
 
 ## Authors
 - S.R. Eshwar
