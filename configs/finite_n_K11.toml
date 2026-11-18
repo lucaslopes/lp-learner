@@ -1,0 +1,26 @@
+# Finite-N evaluation on the larger instance K = 11, T = 30 (CJS), stage `finite_n`.
+# Partitions: K11 = {0},{1,2},{3,4,5},{6,7,8},{9,10},{11} (boundary-aware) and P2 = {0,1},{2,3},...,{10,11} (pairs).
+#
+#   lplearn experiments run finite_n --config configs/finite_n_K11.toml --workers 8
+#   lplearn experiments summarize finite_n --config configs/finite_n_K11.toml --out-dir results/finite_n/summary_K11
+K = 11
+T = 30
+cases = ["CJS"]
+methods = ["A", "D", "K11", "P2", "K11-LP", "P2-LP"]
+lp_update_methods = ["A", "K11-LP", "P2-LP"]
+independent_methods = []
+saddle_source = "learned"
+learned_file = "results/learners/summary/solutions_K11T30.npz"
+learned_seeds = [0, 1, 2]
+N_values = [100, 1000]
+n_chunks = 5
+reps_per_chunk = 100
+seed = 20261009
+
+[smoke]
+saddle_source = "exact_saddle"
+N_values = [100]
+n_chunks = 1
+reps_per_chunk = 5
+methods = ["A", "K11-LP"]
+lp_update_methods = ["K11-LP"]

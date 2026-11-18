@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "lplearn"
-version = "0.9.0"
+version = "0.10.0"
 description = "Python CLI and Rust backend for weakly coupled MDP policy learning"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"

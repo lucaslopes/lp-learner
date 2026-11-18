@@ -31,14 +31,22 @@ policy feasibility.
 The `bound` stage evaluates the state-aggregation lemmas and spectral bounds
 for small research configurations. Its default config includes expensive
 spectral grids, so inspect it and use `--smoke` or a deliberately reduced
-config before an exploratory run. The other unported stages are listed to make
-the gap visible; finite-population, commons and paper stages must be ported
-separately before they can run. Selecting one returns a clear error.
+config before an exploratory run.
+
+The `finite_n` stage simulates projection, LP update or independent policies using
+the reference mechanisms and common random numbers. For learned occupation
+measures, each job records raw minimum, mass per stage, constraint violations,
+and the number of fallback rows and empty stages before policy conversion;
+non-finite learned values are rejected. See `configs/finite_n.toml` for inputs.
+Commons and paper stages remain unported; selecting one returns a clear error.
 
 The shipped `configs/learners.toml` describes a large research grid, including
 millions of iterations per job. Inspect its parameters and use a deliberately
 small separate configuration before running an exploratory test. Do not assume
 that selecting `--smoke` makes the reference workload trivial.
+The finite-N configuration also defines a large grid of replications; use a
+separate, small configuration and a writable external results directory for
+qualification runs.
 
 The runner defaults to a 4 GiB free-memory threshold and may wait for memory.
 `--dry-run`, `--force`, `--only`, and `--smoke` retain their reference meanings.
