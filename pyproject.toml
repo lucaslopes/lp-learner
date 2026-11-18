@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "lplearn"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python CLI and Rust backend for weakly coupled MDP policy learning"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -15,6 +15,7 @@ dependencies = [
     "cvxpy>=1.5",
     "clarabel>=0.7",
     "numba>=0.59",
+    "matplotlib>=3.8",
 ]
 
 [project.urls]

@@ -61,6 +61,77 @@ def load_config(path):
     return {"model": asdict(params), "learning": defaults}
 
 
+def occupation_feasibility(occupation, model, *, tolerance=1e-6):
+    """Report maximum LP constraint violations on the original occupation array.
+
+    Feasibility is assessed against the representative-arm relaxation, not
+    sample-path constraints for a finite population.
+    """
+    y = np.asarray(occupation, dtype=float)
+    if y.shape != (model.T, model.S, model.U) or not np.isfinite(y).all():
+        raise ValueError("occupation has an invalid shape or nonfinite values")
+    if not math.isfinite(tolerance) or tolerance < 0:
+        raise ValueError("feasibility tolerance must be finite and nonnegative")
+    mass = y.sum(axis=2)
+    initial = np.max(np.abs(mass[0] - model.m0))
+    if model.T > 1:
+        inflow = np.einsum("tsu,usk->tk", y[:-1], model.P)
+        flow = np.max(np.abs(mass[1:] - inflow))
+    else:
+        flow = 0.0
+    resource = np.einsum("tsu,lsu->lt", y, model.d) - model.budgets[:, None]
+    values = {
+        "min_occupation": float(y.min()),
+        "nonnegativity_violation": float(max(0.0, -y.min())),
+        "initial_residual": float(initial),
+        "flow_residual": float(flow),
+        "stage_mass_residual": float(np.max(np.abs(mass.sum(axis=1) - 1.0))),
+        "resource_violation": float(max(0.0, np.max(resource))),
+    }
+    values["tolerance"] = float(tolerance)
+    values["feasible"] = all(values[k] <= tolerance for k in (
+        "nonnegativity_violation", "initial_residual", "flow_residual",
+        "stage_mass_residual", "resource_violation"))
+    values["scope"] = "representative-arm LP relaxation"
+    return values
+
+
+def recover_occupation(occupation, model, *, tolerance=1e-6):
+    """Project an iterate onto the representative-arm LP feasible set.
+
+    This changes the learning result. It does not enforce sample-path budgets
+    for a finite population or establish optimizer convergence.
+    """
+    import cvxpy as cp
+
+    y = np.asarray(occupation, dtype=float)
+    raw = occupation_feasibility(y, model, tolerance=tolerance)
+    struct = build_lp(model)
+    x = cp.Variable(struct.n_y)
+    objective = cp.Minimize(cp.sum_squares(x - y.ravel()))
+    problem = cp.Problem(objective, [struct.A @ x == struct.b, struct.D @ x <= struct.r])
+    start = perf_counter()
+    try:
+        problem.solve(solver="CLARABEL")
+    except cp.error.SolverError as error:
+        raise RuntimeError(f"occupation recovery failed: {error}") from error
+    elapsed = perf_counter() - start
+    if (problem.status not in ("optimal", "optimal_inaccurate") or x.value is None
+            or problem.value is None or not np.isfinite(problem.value)):
+        raise RuntimeError(f"occupation recovery failed: {problem.status}")
+    recovered = np.asarray(x.value, dtype=float).reshape(y.shape)
+    checked = occupation_feasibility(recovered, model, tolerance=tolerance)
+    if not checked["feasible"]:
+        raise RuntimeError(f"occupation recovery did not meet tolerance: {checked}")
+    return recovered, {
+        "method": "euclidean_projection_lp_relaxation",
+        "solver": "CLARABEL", "status": problem.status,
+        "seconds": elapsed, "distance_l2": float(np.linalg.norm(recovered - y)),
+        "objective_value": float(problem.value),
+        "original_feasibility": raw, "recovered_feasibility": checked,
+    }
+
+
 def solve(config, method, backend, *, rust_timeout=30.0):
     """Return occupation measures y[t,s,u] and metadata for a single job."""
     if (method, backend) not in {("lp", "cvxpy"), ("gda", "numba"), ("sgda", "numba"),
@@ -109,6 +180,10 @@ def solve(config, method, backend, *, rust_timeout=30.0):
         else:
             metadata.update(solver_reported_seconds=result["wall_time"],
                             solver_timing_scope="Numba _run including any JIT compilation")
+    solve_seconds = perf_counter() - start
+    start = perf_counter()
+    metadata["occupation_feasibility"] = occupation_feasibility(y, model)
+    metadata["feasibility_seconds"] = perf_counter() - start
     return np.asarray(y, dtype=float), {"method": method, "backend": backend,
                                       "model_seconds": model_seconds,
-                                      "solve_seconds": perf_counter() - start, **metadata}
+                                      "solve_seconds": solve_seconds, **metadata}

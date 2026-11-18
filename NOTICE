@@ -11,3 +11,11 @@ are adapted from lp-learner-private commit
 13529bb1235ab9a365b37689c9c30466726d5b7e, GPL-3.0-or-later. Their numerical
 conventions are based on lp_learner/core/instance.py and gda.py at the Python
 reference commit above. serde and serde_json are licensed MIT OR Apache-2.0.
+
+The pie layout and palette in python/lplearn/plotting.py are adapted from
+lp_learner/visualizations/policy.py and lp_learner/utils/variables/palettes.py
+at the Python reference commit stated above, under GPL-3.0-or-later.
+
+The conditional policy and fluid evaluation in python/lplearn/core/policy.py
+are adapted from lp_learner/core/policy.py at the same Python reference commit,
+under GPL-3.0-or-later.

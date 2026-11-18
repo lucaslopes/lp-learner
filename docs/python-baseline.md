@@ -30,7 +30,73 @@ The `.npz` contains `occupation`, `config_json`, and `metadata_json` entries.
 The occupation array is ordered `[time, state, action]`, with action
 `u = 2*a + b`, where `a` is admission and `b` is the high service rate. It is
 an occupation measure, not a conditional action probability. The printed output
-path is absolute. A plot command is separate work.
+path is absolute.
+
+To solve the same configuration with CVXPY and draw its occupation measures:
+
+```sh
+lplearn plot-policy --config policy.toml --method lp --backend cvxpy --output results/lp.png
+```
+
+The short SGDA run in this example can return an infeasible iterate. To inspect
+it as a diagnostic with either backend, explicitly allow that output:
+
+```sh
+lplearn plot-policy --config policy.toml --method sgda --backend numba --allow-infeasible --output results/numba-diagnostic.png
+lplearn plot-policy --config policy.toml --method sgda --backend rust --allow-infeasible --output results/rust-diagnostic.svg --format svg
+```
+
+These SGDA plots show optimization iterates; they do not certify a feasible
+policy. Check the recorded residuals before drawing conclusions from them.
+
+Supported plots are PNG, PDF and SVG. Without `--output`, the command writes
+`results/<config>-<method>-<backend>.png` (or the selected format). It prints
+the absolute path, with a clickable terminal link when supported; `--open`
+requests a viewer. Beside the figure, a `.npy` file contains the unmodified
+occupation tensor and a `.json` manifest records the resolved configuration,
+versions, timings, and SHA-256 hashes. Pie slices show occupation mass per
+action; pie area represents state mass at that time. The visualization omits
+negative entries for display only. It does not change the saved array or
+discard small positive masses.
+
+Each plot uses a new output stem. Existing plots, arrays, manifests and
+recovery sidecars are never overwritten; choose a different `--output` path
+when any of them already exists. Artifacts are prepared in a temporary
+directory and published using same-filesystem hard links with the manifest
+last. The filesystem must support hard links. Stems ending in `.policy` or
+`.recovered` are reserved for sidecars. An interrupted process may leave a
+lock or partial files without a manifest; inspect those before reusing the stem.
+The lock coordinates `lplearn` writers; do not modify its output files from
+another process during publication.
+
+Before plotting, the CLI checks nonnegativity, initial condition, flow,
+stage mass and resource constraints of the representative-arm LP relaxation
+using an absolute tolerance of `1e-6`. Infeasible iterates fail by default.
+To inspect one as a diagnostic, explicitly pass `--allow-infeasible`; the
+figure and CLI identify it as an infeasible iterate and the JSON manifest
+records each residual. Feasibility of the LP relaxation alone does not certify
+sample-path constraints for a finite population.
+
+For an explicit feasible recovery, use `--recover` instead:
+
+```sh
+lplearn plot-policy --config policy.toml --method sgda --backend rust --recover --output results/recovered.png
+```
+
+This numerically solves a CVXPY/CLARABEL quadratic program to find a closest
+occupation measure in Euclidean distance satisfying the representative-arm LP flow,
+nonnegativity and expected-resource constraints. It changes the learner's
+iterate; it is not evidence that the learner converged or that the resulting
+policy is optimal. The extra solve is included in the end-to-end command time.
+The original iterate remains in `recovered.npy`; `recovered.recovered.npy`
+contains the projected occupation, and `recovered.policy.npy` contains the
+induced conditional policy. The manifest records both feasibility reports,
+the projection distance and the feasibility of the induced policy evaluated
+in the model. Feasibility is checked to a tolerance; optimality of the
+projection distance is not independently certified, particularly if the
+solver reports `optimal_inaccurate`. This validates the LP relaxation, not finite-population
+sample-path resource limits. `--recover` and `--allow-infeasible` are mutually
+exclusive.
 
 The same path is available from Python:
 

@@ -2,11 +2,11 @@
 
 from .backend import BackendError, backend_info, backend_ping
 
-__all__ = ["BackendError", "backend_info", "backend_ping", "load_config", "solve"]
+__all__ = ["BackendError", "backend_info", "backend_ping", "load_config", "solve", "recover_occupation"]
 
 
 def __getattr__(name):
-    if name in ("load_config", "solve"):
+    if name in ("load_config", "solve", "recover_occupation"):
         from . import workflow
         return getattr(workflow, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
