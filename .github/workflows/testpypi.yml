@@ -76,9 +76,13 @@ jobs:
       - run: python -m pip install 'maturin>=1.9,<2'
       - run: maturin build --release --out dist
       - run: python -m pip install dist/*.whl
+      - run: python -m pip install 'pytest>=8'
       - name: Test installed wheel and Python entry point
+        env:
+          WEB_WHEEL_CLI_TEST: "1"
         run: |
           python -m unittest discover -s tests -v
+          python -m pytest -q tests/pytest_figure_checks.py tests/test_tutorial_stage.py
           python -m lplearn backend ping
       - if: runner.os != 'Windows'
         run: lplearn backend ping
@@ -103,9 +107,13 @@ jobs:
       - run: python -m pip install 'maturin>=1.9,<2' 'build>=1,<2'
       - run: python -m build --sdist --outdir dist
       - run: python -m pip install --force-reinstall dist/*.tar.gz
+      - run: python -m pip install 'pytest>=8'
       - name: Test installed source distribution
+        env:
+          WEB_WHEEL_CLI_TEST: "1"
         run: |
           python -m unittest discover -s tests -v
+          python -m pytest -q tests/pytest_figure_checks.py tests/test_tutorial_stage.py
           python -m lplearn backend ping
           python -m pip check
       - run: lplearn backend ping
