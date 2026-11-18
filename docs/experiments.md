@@ -38,7 +38,12 @@ the reference mechanisms and common random numbers. For learned occupation
 measures, each job records raw minimum, mass per stage, constraint violations,
 and the number of fallback rows and empty stages before policy conversion;
 non-finite learned values are rejected. See `configs/finite_n.toml` for inputs.
-Commons and paper stages remain unported; selecting one returns a clear error.
+The `commons` stage compares LP-coordinated, independent and selfish queue
+policies with common random numbers under mechanisms M0, M1 and M2. It checks
+and records LP occupation feasibility before deriving conditional actions.
+The default config describes a large study; use an explicitly small fixture
+for a first run. The paper stages must be ported separately before they can run.
+Selecting one returns a clear error.
 
 The shipped `configs/learners.toml` describes a large research grid, including
 millions of iterations per job. Inspect its parameters and use a deliberately

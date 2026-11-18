@@ -1,0 +1,45 @@
+# Stage `commons` for the undergraduate tutorial (papers/Tutorial/main.tex): CJS only.
+#
+#   uv run lplearn experiments run commons --config configs/commons_tutorial.toml --workers 8
+#   uv run lplearn experiments summarize commons --config configs/commons_tutorial.toml --out-dir results/commons/summary_tutorial
+#
+# The base grid and the first three sensitivity scenarios are the CJS part of configs/commons.toml with identical job
+# parameters, so the runner reuses those jobs (same job ids) instead of recomputing them. The two "what-if" scenarios
+# are new: one budget is made non-binding at a time (an attendant for every booth, beta = 1; a car for every booth,
+# alpha = 1) to see which scarcity the loss of the selfish population needs.
+
+seed = 2026
+cases = ["CJS"]
+ns = [10, 100, 1000]
+mechanisms = ["M0", "M1", "M2"]
+tie_breaks = ["no_request", "request"]
+n_chunks = 10
+reps_per_chunk = 200
+table_n = 100
+
+# Base model (identical to configs/commons.toml)
+K = 5
+T = 10
+p = 0.7
+b_low = 0.01
+b_high = 0.1
+alpha = 0.75
+beta = 0.25
+gamma = 100.0
+gamma_bar = 100.0
+
+sensitivity = [
+    { name = "beta=0.10", beta = 0.10, ns = [100], tie_breaks = ["no_request"] },
+    { name = "beta=0.50", beta = 0.50, ns = [100], tie_breaks = ["no_request"] },
+    { name = "gamma_bar=150", gamma_bar = 150.0, ns = [100], tie_breaks = ["no_request"] },
+    { name = "beta=1.00", beta = 1.0, ns = [1000], mechanisms = ["M1", "M2"], tie_breaks = ["no_request"] },
+    { name = "alpha=1.00", alpha = 1.0, ns = [1000], mechanisms = ["M1", "M2"], tie_breaks = ["no_request"] },
+]
+
+[smoke]
+ns = [10]
+mechanisms = ["M1", "M2"]
+tie_breaks = ["no_request"]
+n_chunks = 1
+reps_per_chunk = 20
+sensitivity = []
