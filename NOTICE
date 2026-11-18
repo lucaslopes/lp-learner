@@ -19,3 +19,12 @@ at the Python reference commit stated above, under GPL-3.0-or-later.
 The conditional policy and fluid evaluation in python/lplearn/core/policy.py
 are adapted from lp_learner/core/policy.py at the same Python reference commit,
 under GPL-3.0-or-later.
+
+The compatibility modules under python/lplearn/_legacy/ are adapted from
+lp-learner-new commit c23e6007400daae28737f91d19205233d313d043 by
+S. R. Eshwar, Lucas Lopes Felipe, Alexandre Reiffers-Masson,
+Daniel Sadoc Menasché and Gugan Thoppe. The project is licensed under
+GPL-3.0-or-later; see LICENSE. Internal imports were relocated into the
+lplearn._legacy namespace. Trailing whitespace was normalized, Model now
+initializes its utils dependency, and the legacy plot diagnoses invalid input.
+The backup modules and experiment runner were not included in this layer.
