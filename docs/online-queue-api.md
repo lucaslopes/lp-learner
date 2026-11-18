@@ -59,13 +59,14 @@ transition-observation clock.
 
 ```toml
 [dependencies]
-lplearn = { version = "1.0", default-features = false }
+lplearn = { git = "https://github.com/lucaslopes/lplearn", tag = "v1.0.0", default-features = false }
 ```
 
-For reproducible economy builds, pin the exact published crate version and
-retain `Cargo.lock`. The browser artifact should compile the same crate
-revision to Wasm. Python does not need to be installed to link the Rust
-library.
+This plan distributes the Rust source through the versioned GitHub repository
+tag; publishing the crate to crates.io is outside its scope. For reproducible
+economy builds, pin the tag or its resolved commit and retain `Cargo.lock`.
+The browser artifact should compile the same crate revision to Wasm. Python
+does not need to be installed to link the Rust library.
 
 The API does not promise that a learned policy is feasible for application
 rules. Consumers must apply their own realized-action guards and record the
