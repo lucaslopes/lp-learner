@@ -1,0 +1,92 @@
+# Publication figures of the SIGMETRICS manuscript (stage `figures`, lp_learner/experiments/stages/figures.py).
+#
+#   lplearn experiments run figures --config configs/figures.toml                 # the one trivial job
+#   lplearn experiments summarize figures --config configs/figures.toml           # redraw every figure
+#   lplearn experiments summarize figures --config configs/figures.toml --smoke   # into results/smoke/figures
+#
+# results_root holds the stage folders (learners/, lp_solutions/, finite_n/, bound/, commons/). Each [inputs] path is
+# relative to results_root and is looked up as <results_root>/<path>, then as <results_root>/<stage>/summary/<file>.
+# The schema of every input, the figure definitions and the captions are in reports/figures/README.md.
+
+results_root = "results"
+out_dir = "papers/SIGMETRICS/figures/generated"
+
+figures = [
+    "policy_solutions_non_agg",
+    "policy_solutions_agg",
+    "heatmap_policies_compare",
+    "policies_K11T30",
+    "finite_n_costs",
+    "bound_validation",
+    "dual_prices",
+    "commons_overload",
+]
+
+# Learned solutions (methods C-K): the array shown is `learned_field` of seed `learned_seed`. "y_avg" is the tail
+# average of the iterates; "y_last" is the last iterate, which is what the original notebooks plotted (y[-1]).
+learned_field = "y_avg"
+learned_seed = 0
+
+non_agg_labels = ["A", "B", "C", "D"]
+agg_labels = ["E", "F", "I", "H"]
+heatmap_labels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
+heatmap_range = [0.0, 3.0]
+# Entry of learners' pairwise_{case}.npz: "seed_mean" (mean over seeds) or "seed0".
+distance_key = "seed_mean"
+# Methods of the finite-N figure; each is drawn with its exact-LP aggregate counterpart (label "<method>-LP") if present.
+finite_n_methods = ["A", "B", "D", "E", "F", "G", "K"]
+finite_n_policies = ["projection", "lp_update"]
+dual_methods = ["B", "C", "D", "E", "F", "G"]
+bound_partitions = ["E", "F", "G", "H", "I", "J", "K"]
+# Bound drawn for each row: the best valid bound (B_best = min of the Lemma 1 and spectral bounds).
+bound_value = "B_best"
+# (regime name in bound_rows.csv, panel title). lemma2 is the Lemma 1 regime (Gamma = 2 kappa_max); grid2e-05 is the
+# experimental regime (Gamma_y = 1, Gamma_lambda = Gamma_mu = 2e-5).
+bound_regimes = [["lemma2", "Lemma 1 regime"], ["grid2e-05", "Experimental regime"]]
+
+# No-coordinator experiment: one scenario, case and tie-break; N = 0 takes the largest N in the summary.
+commons_scenario = "base"
+commons_case = "CJS"
+commons_N = 0
+commons_tie_break = "no_request"
+commons_populations = ["coord", "indep", "selfish"]
+commons_mechanisms = ["M0", "M1", "M2"]
+commons_stage_mechanism = "M0"
+
+# Tables with K and T columns (bound_rows.csv) are kept for this instance.
+study_instance = "K5T10"
+
+# The four panels of the K = 11, T = 30 figure, in reading order. `method` is the label in the learners file, or the
+# partition label of the lp_solutions records (B is the regularized LP).
+[[k11_panels]]
+method = "A"
+title = "(A) detailed LP"
+
+[[k11_panels]]
+method = "D"
+title = "(D) SGDA, detailed"
+
+# Aggregate panels show the exact aggregate LPs (lifted). The SGDA aggregate solutions of this instance lose about
+# 70% of their mass over the 30 stages (dual regularization), see results/learners/summary/comparison_K11T30_CJS.csv.
+[[k11_panels]]
+method = "K11-LP"
+title = "LP, { {0}, {1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10}, {11} }"
+
+[[k11_panels]]
+method = "P2-LP"
+title = "LP, { {0, 1}, {2, 3}, {4, 5}, {6, 7}, {8, 9}, {10, 11} }"
+
+[inputs]
+solutions_K5T10 = "learners/solutions_K5T10.npz"
+solutions_K11T30 = "learners/solutions_K11T30.npz"
+pairwise_CJS = "learners/pairwise_CJS.npz"
+pairwise_SJS = "learners/pairwise_SJS.npz"
+lp_solutions_dir = "lp_solutions"
+finite_n_summary = "finite_n/finite_n_summary.csv"
+bound_rows = "bound/bound_rows.csv"
+commons_summary = "commons/commons_summary.csv"
+commons_stages = "commons/commons_stages.csv"
+
+[smoke]
+results_root = "results/smoke"
+out_dir = "results/smoke/figures"

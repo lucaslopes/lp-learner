@@ -1,28 +1,22 @@
 # Online Learning of Weakly Coupled MDP Policies for Load Balancing and Auto Scaling
 
-`lplearn` provides a Python API and CLI for single-configuration policy
-solves with CVXPY, Numba, or a packaged Rust backend.
-Version `0.5.0` adds reproducible comparisons of the full policy plot
-workflow, with matched Numba and Rust learner settings and optional
-feasibility recovery. See the
-[bridge guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md),
-[policy plot examples](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md),
-and [benchmark protocol](https://github.com/lucaslopes/lplearn/blob/main/docs/benchmark-protocol.md).
-
-Version `0.6.0` restores the legacy `Model` and top-level API exports. See the
-[legacy API guide](https://github.com/lucaslopes/lplearn/blob/main/docs/legacy-api.md).
-
-Version `0.7.0` adds a resumable experiment runner and a smoke stage. See the
-[experiment guide](https://github.com/lucaslopes/lplearn/blob/main/docs/experiments.md).
-
-Version `0.8.0` adds CVXPY reference and Numba or Rust learning stages to
-the experiment runner.
-
-Version `0.9.0` adds the state-aggregation bound experiment.
-
-Version `0.10.0` adds finite-population policy simulation.
-
-Version `0.11.0` adds Commons comparison experiments.
+The `lplearn` Python package provides a Rust learning backend.
+See [installation and usage](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md).
+Release `0.1.0` reports backend identity only; `0.2.0` adds single-configuration
+CVXPY/Numba solves; `0.3.0` adds GDA/SGDA on Rust; and `0.4.0` adds policy
+plots, feasibility checks and optional recovery; `0.5.0` adds reproducible,
+recovery-aware policy plot benchmarks across Python and Rust backends; `0.6.0`
+restores the legacy `Model` and top-level API exports; `0.7.0` adds the
+resumable experiment runner and smoke stage; `0.8.0` adds LP-reference and
+learning experiment stages; `0.9.0` adds aggregation bounds, `0.10.0` adds
+finite-population experiments, `0.11.0` adds commons, and `0.12.0` adds
+manuscript tables, figures, tutorial assets and web data export. See
+[the single-job workflow and policy plots](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md).
+For reproducible CLI timing and policy comparisons, see the
+[benchmark protocol](https://github.com/lucaslopes/lplearn/blob/main/docs/benchmark-protocol.md).
+For programs using the earlier Python API, see
+[legacy API compatibility](https://github.com/lucaslopes/lplearn/blob/main/docs/legacy-api.md).
+The resumable runner is described in [the experiment guide](https://github.com/lucaslopes/lplearn/blob/main/docs/experiments.md).
 
 ## Authors
 - S.R. Eshwar

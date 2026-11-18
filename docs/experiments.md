@@ -42,8 +42,21 @@ The `commons` stage compares LP-coordinated, independent and selfish queue
 policies with common random numbers under mechanisms M0, M1 and M2. It checks
 and records LP occupation feasibility before deriving conditional actions.
 The default config describes a large study; use an explicitly small fixture
-for a first run. The paper stages must be ported separately before they can run.
-Selecting one returns a clear error.
+for a first run.
+
+The `tables` stage reads summary CSV files and formats manuscript tables.
+Set `results_root` in its TOML to the root containing the inputs. Its default
+output is the runner's `tables/summary` directory; an explicit TOML `out_dir`
+can select another destination. The CLI `--results-dir` controls the runner's
+job and manifest directory, but does not replace the TOML `results_root` used
+to find table inputs. Missing or malformed inputs fail before any new table is
+written; existing outputs are left in place, and `tables_manifest.json` records
+the failure. Use a fresh output directory for each run.
+
+The `figures` stage redraws selected publication PDFs from recorded results;
+see [figure generation](figures.md). The `tutorial` stage builds tutorial
+figures and tables; see [tutorial generation](tutorial.md). The `web` stage
+exports model and reference JSON; see [web data export](web-export.md).
 
 The shipped `configs/learners.toml` describes a large research grid, including
 millions of iterations per job. Inspect its parameters and use a deliberately

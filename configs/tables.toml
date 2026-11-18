@@ -1,0 +1,11 @@
+# Manuscript tables of Section 8 (stage `tables`), generated from the recorded summaries of the other stages.
+#
+#   uv run lplearn experiments run tables --config configs/tables.toml
+#   uv run lplearn experiments summarize tables --config configs/tables.toml
+results_root = "results"
+# Tables default to the runner's tables/summary directory. To select a
+# different destination, set out_dir explicitly to a writable path.
+tables = ["lp_comparison", "bound", "finite_n", "commons"]
+
+[smoke]
+results_root = "results/smoke"

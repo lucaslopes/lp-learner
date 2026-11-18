@@ -1,0 +1,37 @@
+# Figures, tables and quoted numbers of the undergraduate tutorial (stage `tutorial`,
+# lplearn/experiments/stages/tutorial.py; built by lplearn/visualizations/tutorial_assets.py).
+#
+#   lplearn experiments run tutorial --config configs/tutorial.toml
+#   lplearn experiments summarize tutorial --config configs/tutorial.toml
+#
+# Inputs, relative to results_root: the commons stage summarized with configs/commons_tutorial.toml (into
+# commons/summary_tutorial) and the finite_n stage summary (configs/finite_n.toml). scripts/reproduce_tutorial.sh
+# is not bundled; configure and run the required upstream stages separately.
+
+results_root = "results"
+commons_summary_dir = "commons/summary_tutorial"
+finite_n_summary = "finite_n/summary/finite_n_summary.csv"
+learned_solutions = "learners/summary/solutions_K5T10.npz"
+
+figures = ["tutorial_kernel", "tutorial_values", "tutorial_policies", "tutorial_pies", "tutorial_prices", "tutorial_learned",
+           "tutorial_overload", "tutorial_costs", "tutorial_run"]
+# The illustrative run (tutorial_run): N = 20 booths, replication 0, with this seed (the commons stage seed).
+run_seed = 2026
+tables = ["parameters", "results_main", "results_detail", "dilemma", "whatif", "coordinators", "sensitivity"]
+
+# The CJS instance of the tutorial (identical to the base model of configs/commons_tutorial.toml).
+[model]
+K = 5
+T = 10
+p = 0.7
+b_low = 0.01
+b_high = 0.1
+alpha = 0.75
+beta = 0.25
+gamma = 100.0
+gamma_bar = 100.0
+
+[smoke]
+results_root = "results/smoke"
+commons_summary_dir = "commons/summary"
+finite_n_summary = "finite_n/summary/finite_n_summary.csv"

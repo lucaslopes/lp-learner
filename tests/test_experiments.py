@@ -2,6 +2,7 @@
 
 import json
 import hashlib
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -92,14 +93,11 @@ class ExperimentTests(unittest.TestCase):
             listing = call('list')
             self.assertEqual(listing.returncode, 0, listing.stderr)
             self.assertIn('smoke', listing.stdout)
-            self.assertIn('not written yet', listing.stdout)
-            unavailable_stage = next(
-                line.split()[0] for line in listing.stdout.splitlines()
-                if 'not written yet' in line
-            )
-            unavailable = call('status', unavailable_stage, '--config', str(config), '--results-dir', str(results))
-            self.assertEqual(unavailable.returncode, 2)
-            self.assertIn('does not exist yet', unavailable.stderr)
+            for stage in ('finite_n', 'commons', 'tables', 'figures', 'tutorial', 'web'):
+                self.assertRegex(listing.stdout, re.compile(rf'^{stage}\s+.* available$', re.MULTILINE))
+            unknown = call('status', 'not_a_stage', '--config', str(config), '--results-dir', str(results))
+            self.assertEqual(unknown.returncode, 2)
+            self.assertIn('unknown stage', unknown.stderr)
             missing = call('status', *common)
             self.assertEqual(missing.returncode, 1)
             first = call('run', *common, '--workers', '1', '--min-free-gb', '0')
