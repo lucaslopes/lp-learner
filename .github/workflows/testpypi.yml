@@ -133,6 +133,8 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          # The post-rename rehearsal reuses the existing 0.1.0 files.
+          skip-existing: true
 
   verify-testpypi:
     if: github.event_name == 'workflow_dispatch'
