@@ -1,0 +1,174 @@
+name: TestPyPI rehearsal
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/testpypi.yml
+      - Cargo.toml
+      - build.rs
+      - pyproject.toml
+      - python/**
+      - src/**
+      - tests/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testpypi-rehearsal-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require main and matching package versions
+        id: metadata
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          if (
+              os.environ["GITHUB_EVENT_NAME"] == "workflow_dispatch"
+              and os.environ["GITHUB_REF"] != "refs/heads/main"
+          ):
+              raise SystemExit("TestPyPI rehearsal must run from main")
+
+          project = tomllib.loads(Path("pyproject.toml").read_text())
+          cargo = tomllib.loads(Path("Cargo.toml").read_text())
+          python_version = project["project"]["version"]
+          rust_version = cargo["package"]["version"]
+          if python_version != rust_version:
+              raise SystemExit(
+                  f"pyproject={python_version}, Cargo={rust_version}"
+              )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"version={python_version}\n")
+          print(f"TestPyPI rehearsal version: {python_version}")
+          PY
+
+  wheels:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install 'maturin>=1.9,<2'
+      - run: maturin build --release --out dist
+      - run: python -m pip install --no-index dist/*.whl
+      - name: Test installed wheel and Python entry point
+        run: |
+          python -m unittest discover -s tests -v
+          python -m lplearn backend ping
+      - if: runner.os != 'Windows'
+        run: lplearn backend ping
+      - if: runner.os == 'Windows'
+        shell: cmd
+        run: lplearn.cmd backend ping
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  sdist:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install 'maturin>=1.9,<2' 'build>=1,<2'
+      - run: python -m build --sdist --outdir dist
+      - run: python -m pip install --force-reinstall dist/*.tar.gz
+      - name: Test installed source distribution
+        run: |
+          python -m unittest discover -s tests -v
+          python -m lplearn backend ping
+          python -m pip check
+      - run: lplearn backend ping
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  publish-testpypi:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [validate, wheels, sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/lplearn/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  verify-testpypi:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [validate, publish-testpypi]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and exercise the uploaded TestPyPI wheel
+        env:
+          PACKAGE_VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          for attempt in {1..12}; do
+            if python -m pip install \
+              --index-url https://test.pypi.org/simple/ \
+              --no-deps --only-binary=:all: \
+              "lplearn==$PACKAGE_VERSION"; then
+              break
+            fi
+            if [ "$attempt" -eq 12 ]; then
+              exit 1
+            fi
+            sleep 10
+          done
+          python -m lplearn backend ping
+          python -m pip check
+      - if: runner.os != 'Windows'
+        run: lplearn backend ping
+      - if: runner.os == 'Windows'
+        shell: cmd
+        run: lplearn.cmd backend ping
