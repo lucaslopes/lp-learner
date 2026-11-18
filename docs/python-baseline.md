@@ -4,6 +4,12 @@ Install the local wheel as described in [the bridge guide](python-rust-bridge.md
 The package supports Python 3.12 and uses CVXPY/CLARABEL for the direct LP and
 Numba or Rust for GDA/SGDA. Each command reads a single TOML configuration:
 
+On Intel macOS, package metadata selects the last Numba release line with
+official Intel macOS support and caps NumPy below 2.4, matching that Numba
+line's tested range. Other platforms use the current Numba and NumPy ranges.
+On Windows ARM64, CVXPY is kept below 1.9 until its `sparsediffpy` dependency
+can be installed there without building OpenBLAS from source.
+
 For example, save this as `policy.toml`:
 
 ```toml
@@ -37,6 +43,20 @@ To solve the same configuration with CVXPY and draw its occupation measures:
 ```sh
 lplearn plot-policy --config policy.toml --method lp --backend cvxpy --output results/lp.png
 ```
+
+The default CVXPY solver is CLARABEL. To explicitly select another installed
+CVXPY solver for this direct LP, pass `--cvxpy-solver`; for example:
+
+```sh
+lplearn plot-policy --config policy.toml --method lp --backend cvxpy --cvxpy-solver SCIPY --output results/lp-scipy.png
+```
+
+The selected solver is recorded in the JSON manifest. Different solvers can
+return different optimal occupation measures and conditional policies for a
+degenerate LP, even when their objective values and feasibility agree. Treat
+these as solver-specific results; do not assume their policy plots are
+identical. `--recover` currently uses CLARABEL for its projection and therefore
+rejects a non-default `--cvxpy-solver` selection.
 
 The short SGDA run in this example can return an infeasible iterate. To inspect
 it as a diagnostic with either backend, explicitly allow that output:

@@ -25,6 +25,8 @@ def main(argv=None) -> int:
     solve.add_argument("--config", required=True, help="TOML configuration file")
     solve.add_argument("--method", required=True, choices=("lp", "gda", "sgda"))
     solve.add_argument("--backend", required=True, choices=("cvxpy", "numba", "rust"))
+    solve.add_argument("--cvxpy-solver", default="CLARABEL",
+                       help="CVXPY solver for lp/cvxpy (default: CLARABEL)")
     solve.add_argument("--rust-timeout", type=float, default=30.0,
                        help="Rust solver timeout in seconds (default: 30)")
     solve.add_argument("--output", required=True, help="output .npz file")
@@ -32,6 +34,8 @@ def main(argv=None) -> int:
     plot.add_argument("--config", required=True, help="single-job TOML configuration")
     plot.add_argument("--method", required=True, choices=("lp", "gda", "sgda"))
     plot.add_argument("--backend", required=True, choices=("cvxpy", "numba", "rust"))
+    plot.add_argument("--cvxpy-solver", default="CLARABEL",
+                      help="CVXPY solver for lp/cvxpy (default: CLARABEL)")
     plot.add_argument("--rust-timeout", type=float, default=30.0, help="Rust solver timeout in seconds")
     plot.add_argument("--output", help="output plot file (default: results/<config>-<method>-<backend>.png)")
     plot.add_argument("--format", choices=("png", "pdf", "svg"), help="plot format")
@@ -64,7 +68,8 @@ def _solve(args):
     if output.suffix.lower() != ".npz":
         raise ValueError("output must end in .npz")
     config = load_config(args.config)
-    occupation, metadata = solve(config, args.method, args.backend, rust_timeout=args.rust_timeout)
+    occupation, metadata = solve(config, args.method, args.backend, rust_timeout=args.rust_timeout,
+                                 cvxpy_solver=args.cvxpy_solver)
     output.parent.mkdir(parents=True, exist_ok=True)
     config_json = json.dumps(config, allow_nan=False)
     metadata_json = json.dumps(metadata, allow_nan=False)

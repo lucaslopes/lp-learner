@@ -5,6 +5,7 @@ from importlib import metadata
 from pathlib import Path
 import subprocess
 import sys
+import sysconfig
 import unittest
 from unittest import mock
 
@@ -18,6 +19,18 @@ class BridgeTests(unittest.TestCase):
             [sys.executable, "-I", "-m", "lplearn", "backend", "ping"],
             text=True, capture_output=True, check=True,
         )
+        self.assertEqual(json.loads(result.stdout)["backend"], "rust")
+
+    def test_native_cli_launcher_invokes_installed_python_cli(self):
+        is_windows = sys.platform == "win32"
+        name = "lplearn.cmd" if is_windows else "lplearn"
+        launcher = Path(sysconfig.get_path("scripts")) / name
+        result = subprocess.run(
+            f'"{launcher}" backend ping' if is_windows else [str(launcher), "backend", "ping"],
+            shell=is_windows,
+            text=True, capture_output=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["backend"], "rust")
 
     def test_ping_and_info(self):

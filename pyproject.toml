@@ -4,17 +4,20 @@ build-backend = "maturin"
 
 [project]
 name = "lplearn"
-version = "0.12.0"
+version = "0.13.0"
 description = "Python interface for weakly coupled MDP policy learning"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = { file = "LICENSE" }
 dependencies = [
-    "numpy>=1.26,<2.3",
+    "numpy>=1.26,<2.4; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "numpy>=1.26,<2.6; sys_platform != 'darwin' or platform_machine != 'x86_64'",
     "scipy>=1.11",
-    "cvxpy>=1.5",
+    "cvxpy>=1.5,<1.9; sys_platform == 'win32' and platform_machine == 'ARM64'",
+    "cvxpy>=1.5; sys_platform != 'win32' or platform_machine != 'ARM64'",
     "clarabel>=0.7",
-    "numba>=0.59",
+    "numba>=0.62.1,<0.63; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "numba>=0.59; sys_platform != 'darwin' or platform_machine != 'x86_64'",
     "matplotlib>=3.8",
     "pandas>=2.1",
     "tqdm>=4.66",
@@ -35,6 +38,7 @@ bindings = "bin"
 python-source = "python"
 module-name = "lplearn"
 targets = [
+    { name = "lplearn", kind = "bin" },
     { name = "lplearn-native", kind = "bin" },
     { name = "lplearn-solver", kind = "bin" },
 ]

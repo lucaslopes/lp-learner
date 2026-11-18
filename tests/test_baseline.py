@@ -28,6 +28,42 @@ class BaselineTests(unittest.TestCase):
             np.testing.assert_allclose(lp.A @ y.ravel(), lp.b, atol=1e-6)
             self.assertLessEqual(np.max(lp.D @ y.ravel() - lp.r), 1e-6)
 
+    def test_lp_api_records_explicit_cvxpy_solver(self):
+        with tempfile.TemporaryDirectory() as temp:
+            config_path = Path(temp) / "config.toml"
+            config_path.write_text('[model]\nK=2\nT=3\ncase="CJS"\n')
+            config = lplearn.load_config(config_path)
+            y, metadata = lplearn.solve(config, "lp", "cvxpy", cvxpy_solver="SCIPY")
+            self.assertEqual(metadata["solver"], "SCIPY")
+            lp = build_lp(queue_wcmdp(QueueParams(K=2, T=3, case="CJS")))
+            np.testing.assert_allclose(lp.A @ y.ravel(), lp.b, atol=1e-6)
+            self.assertLessEqual(np.max(lp.D @ y.ravel() - lp.r), 1e-6)
+
+    def test_cvxpy_solver_option_is_rejected_for_learning_backends(self):
+        with tempfile.TemporaryDirectory() as temp:
+            config_path = Path(temp) / "config.toml"
+            config_path.write_text('[model]\nK=2\nT=3\ncase="CJS"\n')
+            config = lplearn.load_config(config_path)
+            with self.assertRaisesRegex(ValueError, "only configurable for the cvxpy backend"):
+                lplearn.solve(config, "sgda", "numba", cvxpy_solver="SCIPY")
+
+    def test_cli_solve_records_explicit_cvxpy_solver(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            config = root / "config.toml"
+            output = root / "scipy-solve.npz"
+            config.write_text('[model]\nK=2\nT=3\ncase="CJS"\n')
+            proc = subprocess.run([sys.executable, "-m", "lplearn", "solve",
+                                   "--config", str(config), "--method", "lp", "--backend", "cvxpy",
+                                   "--cvxpy-solver", "SCIPY", "--output", str(output)],
+                                  check=False, text=True, capture_output=True, timeout=180)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            self.assertTrue(output.is_file())
+            with np.load(output, allow_pickle=False) as result:
+                metadata = json.loads(str(result["metadata_json"]))
+                self.assertEqual(metadata["solver"], "SCIPY")
+                self.assertEqual(result["occupation"].shape, (3, 3, 4))
+
     def test_cli_sgda_is_repeatable_and_records_configuration(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

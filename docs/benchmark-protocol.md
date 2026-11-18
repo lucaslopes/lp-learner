@@ -18,7 +18,7 @@ that will be measured:
 ```bash
 run_qualification() {
 "$LPL_VENV/bin/python" scripts/benchmark_policy.py \
-  --command "$LPL_VENV/bin/lplearn" --cwd "$PWD" \
+  --command "$LPL_VENV/bin/python -m lplearn" --cwd "$PWD" \
   --config configs/policy.toml --output-dir "$DATABASE_DIR/benchmark-qualification" \
   --case lp:lp:cvxpy --case numba:sgda:numba --case rust:sgda:rust \
   --environment-python "$LPL_VENV/bin/python" --numba-cache-state per-process-empty \

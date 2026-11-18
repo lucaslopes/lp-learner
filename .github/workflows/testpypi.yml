@@ -62,7 +62,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15, windows-latest]
+        include:
+          - os: ubuntu-24.04
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: ubuntu-24.04-arm
+            python_arch: arm64
+            platform_suffix: aarch64
+          - os: macos-15-intel
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: macos-15
+            python_arch: arm64
+            platform_suffix: arm64
+          - os: windows-2025
+            python_arch: x64
+            platform_suffix: win-amd64
+          - os: windows-11-arm
+            python_arch: arm64
+            platform_suffix: win-arm64
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -72,6 +90,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          architecture: ${{ matrix.python_arch }}
+      - name: Verify Python target architecture
+        env:
+          EXPECTED_ARCH: ${{ matrix.python_arch }}
+        run: |
+          python - <<'PY'
+          import os
+          import platform
+
+          actual = platform.machine().lower()
+          expected = os.environ["EXPECTED_ARCH"]
+          aliases = {
+              "x64": {"x86_64", "amd64"},
+              "arm64": {"arm64", "aarch64"},
+          }
+          print("Python machine:", actual, "expected architecture:", expected)
+          raise SystemExit(0 if actual in aliases[expected] else 1)
+          PY
       - uses: dtolnay/rust-toolchain@stable
       - run: python -m pip install 'maturin>=1.9,<2'
       - run: maturin build --release --out dist
@@ -102,7 +138,7 @@ jobs:
         run: lplearn.cmd backend ping
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.os }}
+          name: dist-${{ matrix.os }}-${{ matrix.python_arch }}
           path: dist/*.whl
           if-no-files-found: error
 
@@ -172,7 +208,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15, windows-latest]
+        include:
+          - os: ubuntu-24.04
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: ubuntu-24.04-arm
+            python_arch: arm64
+            platform_suffix: aarch64
+          - os: macos-15-intel
+            python_arch: x64
+            platform_suffix: x86_64
+          - os: macos-15
+            python_arch: arm64
+            platform_suffix: arm64
+          - os: windows-2025
+            python_arch: x64
+            platform_suffix: win-amd64
+          - os: windows-11-arm
+            python_arch: arm64
+            platform_suffix: win-arm64
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -181,6 +235,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          architecture: ${{ matrix.python_arch }}
+      - name: Verify Python target architecture
+        env:
+          EXPECTED_ARCH: ${{ matrix.python_arch }}
+        run: |
+          python - <<'PY'
+          import os
+          import platform
+
+          actual = platform.machine().lower()
+          expected = os.environ["EXPECTED_ARCH"]
+          aliases = {
+              "x64": {"x86_64", "amd64"},
+              "arm64": {"arm64", "aarch64"},
+          }
+          print("Python machine:", actual, "expected architecture:", expected)
+          raise SystemExit(0 if actual in aliases[expected] else 1)
+          PY
       - name: Install and exercise the uploaded TestPyPI wheel
         env:
           PACKAGE_VERSION: ${{ needs.validate.outputs.version }}
