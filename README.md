@@ -9,6 +9,9 @@ feasibility recovery. See the
 [policy plot examples](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md),
 and [benchmark protocol](https://github.com/lucaslopes/lplearn/blob/main/docs/benchmark-protocol.md).
 
+Version `0.6.0` restores the legacy `Model` and top-level API exports. See the
+[legacy API guide](https://github.com/lucaslopes/lplearn/blob/main/docs/legacy-api.md).
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe
