@@ -3,7 +3,7 @@
 The initial `lplearn` Python package provides a diagnostic bridge to a Rust
 backend. The first software release is `0.1.0`; this bootstrap reports backend
 identity only and does not solve a policy. See
-[installation and usage](docs/python-rust-bridge.md).
+[installation and usage](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md).
 
 ## Authors
 - S.R. Eshwar
