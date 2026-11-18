@@ -1,0 +1,45 @@
+# Stage `commons`: selfish queues against the LP-coordinated policy, with no coordinator.
+#
+#   uv run lplearn experiments run commons --config configs/commons.toml --smoke --workers 2   # smoke grid
+#   uv run lplearn experiments run commons --config configs/commons.toml --workers 8           # full matrix
+#   uv run lplearn experiments summarize commons --config configs/commons.toml
+#
+# A job is one chunk of reps_per_chunk replications of one setting. Every population runs on the same
+# replications (common random numbers keyed by [seed, replication, stream]). The mechanisms and the tie-break rule
+# are documented in lplearn/commons/mechanisms.py and selfish.py. Smoke outputs go to results/smoke/commons/.
+
+seed = 2026
+cases = ["CJS", "SJS"]
+ns = [10, 100, 1000]
+mechanisms = ["M0", "M1", "M2"]
+tie_breaks = ["no_request", "request"]
+n_chunks = 10
+reps_per_chunk = 200
+table_n = 100
+
+# Base model (manuscript Section 7; the coordinated reference is the unregularized LP, method A)
+K = 5
+T = 10
+p = 0.7
+b_low = 0.01
+b_high = 0.1
+alpha = 0.75
+beta = 0.25
+gamma = 100.0
+gamma_bar = 100.0
+
+# Sensitivity scenarios: N = 100, default tie-break. Each entry overrides the base values above.
+sensitivity = [
+    { name = "beta=0.10", beta = 0.10, ns = [100], tie_breaks = ["no_request"] },
+    { name = "beta=0.50", beta = 0.50, ns = [100], tie_breaks = ["no_request"] },
+    { name = "gamma_bar=150", gamma_bar = 150.0, ns = [100], tie_breaks = ["no_request"] },
+]
+
+[smoke]
+cases = ["CJS"]
+ns = [10]
+mechanisms = ["M0", "M1", "M2"]
+tie_breaks = ["no_request"]
+n_chunks = 1
+reps_per_chunk = 20
+sensitivity = []

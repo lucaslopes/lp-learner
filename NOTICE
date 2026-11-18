@@ -51,3 +51,8 @@ The finite_n policies, mechanisms, simulator, experiment stage and TOML
 configurations are adapted from the corresponding Python reference paths at
 the commit above, under GPL-3.0-or-later. Imports, stage version and learned
 occupation diagnostics were adapted.
+
+The commons experiment, mechanisms, selfish policies, experiment stage and
+TOML configurations are adapted from the corresponding Python reference paths
+at the commit above, under GPL-3.0-or-later. Imports were updated, and the LP
+occupation is checked and recorded before conditional policy conversion.

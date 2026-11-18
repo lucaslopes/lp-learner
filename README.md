@@ -22,6 +22,8 @@ Version `0.9.0` adds the state-aggregation bound experiment.
 
 Version `0.10.0` adds finite-population policy simulation.
 
+Version `0.11.0` adds Commons comparison experiments.
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe

@@ -1,4 +1,4 @@
 {
   "request": {"schema": "lplearn-bridge/1", "command": "ping"},
-  "response": {"schema": "lplearn-bridge/1", "command": "ping", "backend": "rust", "version": "0.10.0", "capabilities": ["gda", "sgda"]}
+  "response": {"schema": "lplearn-bridge/1", "command": "ping", "backend": "rust", "version": "0.11.0", "capabilities": ["gda", "sgda"]}
 }
