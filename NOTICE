@@ -1,0 +1,7 @@
+The modules python/lplearn/core/{instance,lp,gda}.py are adapted from
+lp-learner-new commit c23e6007400daae28737f91d19205233d313d043
+(https://github.com/lucaslopes/lp-learner-new). The original work is by
+S. R. Eshwar, Lucas Lopes Felipe, Alexandre Reiffers-Masson,
+Daniel Sadoc Menasche and Gugan Thoppe, and is distributed under
+GPL-3.0-or-later; see LICENSE. The legacy-only kernel helper was removed,
+and the modules have moved to the lplearn namespace.

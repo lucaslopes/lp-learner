@@ -4,11 +4,18 @@ build-backend = "maturin"
 
 [project]
 name = "lplearn"
-version = "0.1.0"
-description = "Diagnostic Python and Rust bridge for weakly coupled MDP policy learning"
+version = "0.2.0"
+description = "Python API and CLI for weakly coupled MDP policy learning"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 license = { file = "LICENSE" }
+dependencies = [
+    "numpy>=1.26,<2.3",
+    "scipy>=1.11",
+    "cvxpy>=1.5",
+    "clarabel>=0.7",
+    "numba>=0.59",
+]
 
 [project.urls]
 Documentation = "https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md"

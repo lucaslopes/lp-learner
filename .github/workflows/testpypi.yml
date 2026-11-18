@@ -75,7 +75,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: python -m pip install 'maturin>=1.9,<2'
       - run: maturin build --release --out dist
-      - run: python -m pip install --no-index dist/*.whl
+      - run: python -m pip install dist/*.whl
       - name: Test installed wheel and Python entry point
         run: |
           python -m unittest discover -s tests -v
