@@ -93,16 +93,20 @@ jobs:
           architecture: ${{ matrix.python_arch }}
       - name: Verify Python target architecture
         env:
-          EXPECTED_PLATFORM_SUFFIX: ${{ matrix.platform_suffix }}
+          EXPECTED_ARCH: ${{ matrix.python_arch }}
         run: |
           python - <<'PY'
           import os
-          import sysconfig
+          import platform
 
-          actual = sysconfig.get_platform().lower()
-          expected = os.environ["EXPECTED_PLATFORM_SUFFIX"]
-          print("Python platform:", actual, "expected suffix:", expected)
-          raise SystemExit(0 if actual.endswith(expected) else 1)
+          actual = platform.machine().lower()
+          expected = os.environ["EXPECTED_ARCH"]
+          aliases = {
+              "x64": {"x86_64", "amd64"},
+              "arm64": {"arm64", "aarch64"},
+          }
+          print("Python machine:", actual, "expected architecture:", expected)
+          raise SystemExit(0 if actual in aliases[expected] else 1)
           PY
       - uses: dtolnay/rust-toolchain@stable
       - run: python -m pip install 'maturin>=1.9,<2'
@@ -234,16 +238,20 @@ jobs:
           architecture: ${{ matrix.python_arch }}
       - name: Verify Python target architecture
         env:
-          EXPECTED_PLATFORM_SUFFIX: ${{ matrix.platform_suffix }}
+          EXPECTED_ARCH: ${{ matrix.python_arch }}
         run: |
           python - <<'PY'
           import os
-          import sysconfig
+          import platform
 
-          actual = sysconfig.get_platform().lower()
-          expected = os.environ["EXPECTED_PLATFORM_SUFFIX"]
-          print("Python platform:", actual, "expected suffix:", expected)
-          raise SystemExit(0 if actual.endswith(expected) else 1)
+          actual = platform.machine().lower()
+          expected = os.environ["EXPECTED_ARCH"]
+          aliases = {
+              "x64": {"x86_64", "amd64"},
+              "arm64": {"arm64", "aarch64"},
+          }
+          print("Python machine:", actual, "expected architecture:", expected)
+          raise SystemExit(0 if actual in aliases[expected] else 1)
           PY
       - name: Install and exercise the uploaded TestPyPI wheel
         env:
