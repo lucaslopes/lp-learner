@@ -4,8 +4,8 @@ build-backend = "maturin"
 
 [project]
 name = "lplearn"
-version = "0.11.0"
-description = "Python CLI and Rust backend for weakly coupled MDP policy learning"
+version = "0.12.0"
+description = "Python interface for weakly coupled MDP policy learning"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = { file = "LICENSE" }

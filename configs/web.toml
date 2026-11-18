@@ -1,0 +1,23 @@
+# Browser data export. The two JSON files default to the web stage summary
+# directory. Set model_json/reference_json explicitly to choose other paths.
+# The frontend itself and historical result CSVs are not included here.
+#
+# lplearn experiments run web --config configs/web.toml --results-dir /path/to/results --workers 1
+# lplearn experiments summarize web --config configs/web.toml --results-dir /path/to/results
+
+results_root = "results"
+commons_summary_dir = "commons/summary_tutorial"
+finite_n_summary = "finite_n/summary/finite_n_summary.csv"
+alphas = [0.5, 0.625, 0.75, 0.875, 1.0]
+betas = [0.1, 0.25, 0.4, 0.5, 0.75, 1.0]
+
+[model]
+K = 5
+T = 10
+p = 0.7
+b_low = 0.01
+b_high = 0.1
+alpha = 0.75
+beta = 0.25
+gamma = 100.0
+gamma_bar = 100.0

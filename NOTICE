@@ -56,3 +56,26 @@ The commons experiment, mechanisms, selfish policies, experiment stage and
 TOML configurations are adapted from the corresponding Python reference paths
 at the commit above, under GPL-3.0-or-later. Imports were updated, and the LP
 occupation is checked and recorded before conditional policy conversion.
+
+The tables stage and configuration are adapted from the corresponding Python
+reference paths at the commit above, under GPL-3.0-or-later. Imports, command
+names, default output destination and validation/write behavior were adapted.
+
+The paper figure generator, its `figures` stage, configuration and adapted
+tests derive from the same Python reference commit under GPL-3.0-or-later.
+Imports and CLI examples were adapted. Failed redraws preserve existing PDFs
+and report them separately; materially infeasible pie inputs are labeled as
+clipped diagnostic iterates in their panels.
+
+The tutorial asset generator, `tutorial` stage and configuration are adapted
+from the corresponding Python reference paths at commit
+c23e6007400daae28737f91d19205233d313d043 under GPL-3.0-or-later. Imports and
+command names were changed; output destinations are safe by default, and
+partial, data-independent selections and input-failure reporting were added.
+
+Web export: python/lplearn/visualizations/web_export.py derives from
+lp-learner-new commit c23e6007400daae28737f91d19205233d313d043,
+python/lp_learner/visualizations/web_export.py, under GPL-3.0-or-later.
+The experiment stage/config were adapted from that snapshot;
+default outputs are local to the runner summary and input and occupation
+validation plus replication provenance were added. Frontend not included.
