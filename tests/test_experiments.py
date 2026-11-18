@@ -93,7 +93,7 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(listing.returncode, 0, listing.stderr)
             self.assertIn('smoke', listing.stdout)
             self.assertIn('not written yet', listing.stdout)
-            unavailable = call('status', 'bound', '--config', str(config), '--results-dir', str(results))
+            unavailable = call('status', 'finite_n', '--config', str(config), '--results-dir', str(results))
             self.assertEqual(unavailable.returncode, 2)
             self.assertIn('does not exist yet', unavailable.stderr)
             missing = call('status', *common)
