@@ -18,6 +18,8 @@ Version `0.7.0` adds a resumable experiment runner and a smoke stage. See the
 Version `0.8.0` adds CVXPY reference and Numba or Rust learning stages to
 the experiment runner.
 
+Version `0.9.0` adds the state-aggregation bound experiment.
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe

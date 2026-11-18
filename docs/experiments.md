@@ -28,9 +28,12 @@ minimum, flow/budget/nonnegativity violations, backend identity and timing
 scope; short runs can be infeasible and these diagnostics do not establish
 policy feasibility.
 
-The original names of the remaining stages are listed to make the gap visible;
-bound, finite-population, commons and paper stages must be ported separately
-before they can run. Selecting one returns a clear error.
+The `bound` stage evaluates the state-aggregation lemmas and spectral bounds
+for small research configurations. Its default config includes expensive
+spectral grids, so inspect it and use `--smoke` or a deliberately reduced
+config before an exploratory run. The other unported stages are listed to make
+the gap visible; finite-population, commons and paper stages must be ported
+separately before they can run. Selecting one returns a clear error.
 
 The shipped `configs/learners.toml` describes a large research grid, including
 millions of iterations per job. Inspect its parameters and use a deliberately

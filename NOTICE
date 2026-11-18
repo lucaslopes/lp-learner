@@ -41,3 +41,8 @@ under GPL-3.0-or-later. Imports and learner non-finite checks were adapted.
 
 The learners stage additionally dispatches to the Rust solver, records backend
 identity and occupation diagnostics, and uses a new stage cache version.
+
+The aggregation-bound analysis, experiment stage and its TOML configuration
+are adapted from the corresponding Python reference paths at commit
+c23e6007400daae28737f91d19205233d313d043 under GPL-3.0-or-later. Imports and
+CLI examples were updated for the lplearn namespace.

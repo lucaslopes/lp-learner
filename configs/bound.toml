@@ -1,0 +1,58 @@
+# Numerical validation of the aggregation bound (Section 6 of the manuscript: Lemma 1, Lemma 2,
+# Theorem 1 and Proposition 1). Definitions and findings: reports/bound/README.md.
+#
+#   uv run lplearn experiments run bound --config configs/bound.toml --smoke --workers 2
+#   uv run lplearn experiments summarize bound --config configs/bound.toml --smoke
+#   uv run lplearn experiments run bound --config configs/bound.toml --workers 2
+#   uv run lplearn experiments summarize bound --config configs/bound.toml
+#
+# Instance: K=5, T=10 for CJS and SJS with the manuscript defaults (p=0.7, b_low=0.01, b_high=0.1,
+# alpha=0.75, beta=0.25, gamma=gamma_bar=100). The partitions (E)-(K) and the singleton are studied; kappa_max
+# is taken over (E)-(K) in every run, so smoke rows match the full run for the same labels.
+#
+# Regimes: lemma factor f gives Gamma_y = Gamma_lambda = Gamma_mu = f kappa_max (Lemma 1 applies).
+#          grid value g gives (Gamma_y, Gamma_lambda, Gamma_mu) = (gamma_y, g, g) (Lemma 1 does not apply).
+# Conventions: 'paper' (literal Section 6 maps) and 'consistent' (G_bar(w) = Pi G(Pi w)).
+# Optional: K11T30 with PARTITION_K11 (CJS) and the exactly lumpable sanity instance of tests/test_core.py.
+
+K = 5
+T = 10
+cases = ["CJS", "SJS"]
+partitions = ["E", "F", "G", "H", "I", "J", "K", "singleton"]
+p = 0.7
+b_low = 0.01
+b_high = 0.1
+alpha = 0.75
+beta = 0.25
+gamma = 100.0
+gamma_bar = 100.0
+
+lemma_factors = [2.0, 1.25]
+gamma_y = 1.0
+gamma_grid = [1.0, 0.1, 0.01, 0.001, 0.0001, 2e-5]
+conventions = ["paper", "consistent"]
+eta_grid_points = 13
+
+sweep_p = [0.3, 0.5, 0.7, 0.9]
+sweep_b_high = [0.1, 0.3, 0.5]
+
+include_lumpable = true
+include_k11 = true
+k11_cases = ["CJS"]
+k11_eta_grid_points = 5
+
+# Regime and convention shown in the LaTeX tables (names as in bound_rows.csv).
+table_regime = "lemma2"
+table_convention = "consistent"
+experimental_regime = "grid2e-05"
+
+[smoke]
+cases = ["CJS"]
+partitions = ["E", "singleton"]
+gamma_grid = [1.0, 2e-5]
+lemma_factors = [2.0]
+eta_grid_points = 5
+sweep_p = [0.7]
+sweep_b_high = [0.1]
+include_lumpable = false
+include_k11 = false
