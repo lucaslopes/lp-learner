@@ -1,0 +1,35 @@
+# Experiment runner
+
+`lplearn experiments` ports the experiment runner from the original Python
+reference (see `NOTICE`). It executes registered jobs in a spawned process
+pool, saves one compressed array archive and JSON record per job, and skips
+complete jobs when rerun. Use `--results-dir` or `LPL_RESULTS_DIR` to place
+generated results outside the source tree.
+
+```sh
+lplearn experiments list
+lplearn experiments run smoke --config configs/smoke.toml --workers 1 --min-free-gb 0 --results-dir /tmp/lplearn-results
+lplearn experiments status smoke --config configs/smoke.toml --results-dir /tmp/lplearn-results
+lplearn experiments summarize smoke --config configs/smoke.toml --results-dir /tmp/lplearn-results
+```
+
+The included `smoke` stage solves small random matrix eigenproblems to exercise
+the runner. It is not a queue-policy experiment. The original stage names are
+listed to make the gap visible, but only `smoke` is included in this change;
+the LP, learning, bound, finite-population, commons and paper stages must be
+ported separately before they can run. Selecting one returns a clear error.
+
+The runner defaults to a 4 GiB free-memory threshold and may wait for memory.
+`--dry-run`, `--force`, `--only`, and `--smoke` retain their reference meanings.
+Each run writes a manifest recording config and environment identities. On
+Windows the `resource` module is unavailable, so worker peak RSS is reported
+as null rather than as a current-memory measurement.
+
+Manifest schema 2 separates `environment.caller_project` (the working
+directory's Git state and source-tree hash) from `environment.installed_runtime`
+(the imported package path, hashes of its Python/native module files, the
+distribution RECORD hash, and the paths and hashes of packaged workers). The
+caller's Git commit is not assumed to be the revision of the imported wheel.
+Listing a worker records an available binary; it does not assert that a job
+executed that worker. Distribution metadata may be absent or refer to a
+different import path for editable or otherwise unusual installations.

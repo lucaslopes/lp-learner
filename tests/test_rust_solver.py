@@ -61,7 +61,7 @@ class RustSolverTests(unittest.TestCase):
                         metadata = json.loads(str(data["metadata_json"]))
                         self.assertEqual(metadata["backend"], backend)
                         if backend == "rust":
-                            self.assertEqual(metadata["backend_version"], "0.6.0")
+                            self.assertEqual(metadata["backend_version"], "0.7.0")
                             self.assertIs(metadata["backend_debug_assertions"], False)
                             self.assertGreaterEqual(metadata["backend_process_seconds"],
                                                     metadata["solver_reported_seconds"])
