@@ -60,9 +60,20 @@ jobs:
       - name: Test installed wheel
         env:
           WEB_WHEEL_CLI_TEST: "1"
-        run: |
-          python -m unittest discover -s tests -v
-          python -m pytest -q tests/pytest_figure_checks.py tests/test_tutorial_stage.py
+        timeout-minutes: 8
+        run: python -m unittest discover -s tests -v
+      - name: Test publication figure suite
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/pytest_figure_checks.py
+      - name: Test tutorial stage
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/test_tutorial_stage.py
       - run: python -m lplearn backend ping
       - if: runner.os != 'Windows'
         run: lplearn backend ping
@@ -91,9 +102,20 @@ jobs:
       - name: Test installed source distribution
         env:
           WEB_WHEEL_CLI_TEST: "1"
-        run: |
-          python -m unittest discover -s tests -v
-          python -m pytest -q tests/pytest_figure_checks.py tests/test_tutorial_stage.py
+        timeout-minutes: 8
+        run: python -m unittest discover -s tests -v
+      - name: Test source distribution figures
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/pytest_figure_checks.py
+      - name: Test source distribution tutorial stage
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+        timeout-minutes: 8
+        run: python -m pytest -vv -o faulthandler_timeout=180 tests/test_tutorial_stage.py
       - run: python -m lplearn backend ping
       - run: python -m pip check
       - uses: actions/upload-artifact@v4
