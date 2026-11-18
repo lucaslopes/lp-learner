@@ -28,3 +28,8 @@ GPL-3.0-or-later; see LICENSE. Internal imports were relocated into the
 lplearn._legacy namespace. Trailing whitespace was normalized, Model now
 initializes its utils dependency, and the legacy plot diagnoses invalid input.
 The backup modules and experiment runner were not included in this layer.
+
+The experiment runner and smoke stage in python/lplearn/experiments, together
+with configs/smoke.toml, are adapted from the corresponding paths at the same
+Python reference commit, under GPL-3.0-or-later. Imports, packaging, provenance,
+Windows peak-RSS handling and pickle-free NumPy archive writing were adapted.

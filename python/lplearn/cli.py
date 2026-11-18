@@ -9,8 +9,13 @@ from .backend import BackendError, backend_info, backend_ping
 
 
 def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "experiments":
+        from .experiments.cli import main as experiments_main
+        return experiments_main(argv[1:])
     parser = argparse.ArgumentParser(prog="lplearn")
     commands = parser.add_subparsers(dest="section", required=True)
+    commands.add_parser("experiments", help="run and summarize experiment stages")
     backend = commands.add_parser("backend", help="inspect the Rust backend")
     actions = backend.add_subparsers(dest="action", required=True)
     for action in ("ping", "info"):

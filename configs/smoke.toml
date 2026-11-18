@@ -1,0 +1,22 @@
+# Runner smoke test: a 12-job grid of tiny eigenproblems, used by tests/test_runner.py.
+#
+#   lplearn experiments run smoke --config configs/smoke.toml --workers 2
+#   lplearn experiments summarize smoke --config configs/smoke.toml
+#
+# Precedence in --smoke mode: base keys below < the stage's SMOKE dict < this file's [smoke] table.
+# Smoke results go to results/smoke/ (or <results-dir>/smoke/), never next to the full runs.
+
+sizes = [4, 8]
+alphas = [0.5, 1.0]
+seeds = [0, 1, 2]
+sleep_s = 0.05
+
+# Fault injection (off by default): the job with seed == fault_seed raises while the
+# file named by fault_marker exists. Uncomment both lines to see failure handling:
+# fault_seed = 1
+# fault_marker = "results/smoke-fault.flag"
+
+[smoke]
+sizes = [4]
+seeds = [0, 1]
+sleep_s = 0.0
