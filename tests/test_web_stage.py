@@ -18,6 +18,13 @@ from lplearn.visualizations.web_export import _r
 
 
 class WebStageTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.model = {'K': 1, 'T': 2, 'p': .7, 'b_low': .01, 'b_high': .1, 'alpha': .75, 'beta': .25, 'gamma': 100., 'gamma_bar': 100.}
+        # All tests use the same tiny model. Solve its reference LP once rather
+        # than repeating the CVXPY solve for every temporary test directory.
+        cls.objective = ta.solve_tutorial_model(ta.base_params(cls.model)).lp['objective']
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -27,8 +34,7 @@ class WebStageTest(unittest.TestCase):
         finite = self.input / 'finite_n' / 'summary'
         common.mkdir(parents=True)
         finite.mkdir(parents=True)
-        self.model = {'K': 1, 'T': 2, 'p': .7, 'b_low': .01, 'b_high': .1, 'alpha': .75, 'beta': .25, 'gamma': 100., 'gamma_bar': 100.}
-        objective = ta.solve_tutorial_model(ta.base_params(self.model)).lp['objective']
+        objective = self.objective
         base = {'case': 'CJS', 'tie_break': 'no_request', 'reps': 3}
         summary, paired, dilemma = [], [], []
         for scenario in ['base', 'beta=1.00', 'alpha=1.00', 'beta=0.10', 'beta=0.50']:
