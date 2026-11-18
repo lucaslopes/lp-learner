@@ -1,0 +1,67 @@
+# Learners (methods (C)-(K) of Table tab:methods): GDA on the detailed grid (C) and SGDA on the detailed grid
+# (D) and on the aggregate grids (E)-(K) for K = 5, and on the detailed grid (D) and the K11 partition for K = 11.
+# Hyperparameters follow LEARNER_DEFAULTS in lplearn/experiments/methods.py. Keep Gamma_* equal to configs/lp_solutions.toml.
+#
+#   lplearn experiments run learners --config configs/learners.toml --workers 8
+#   lplearn experiments run learners --config configs/learners.toml --smoke --workers 2
+#   lplearn experiments summarize learners --config configs/learners.toml
+#
+# One job is one (instance, case, method, seed). Method C uses gda_seeds, where the seed only changes the
+# random initialization. The SGDA methods use sgda_seeds. The [legacy] table locates the stored legacy arrays
+# that the comparison metrics use; a missing directory only disables those comparisons.
+
+backend = "numba"       # choose "rust" for the packaged Rust worker
+rust_timeout = 3600     # seconds per Rust solve; ignored by Numba
+
+[K5T10]
+cases = ["CJS", "SJS"]
+gda_seeds = [0, 1, 2]
+sgda_methods = ["D", "E", "F", "G", "H", "I", "J", "K"]
+sgda_seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+[K5T10.hyper]
+Gamma_y = 1.0          # manuscript convention (legacy 0.5)
+Gamma_lambda = 2e-5    # legacy 1e-5
+Gamma_mu = 2e-5        # legacy 1e-5
+eta_y = 0.9
+eta_dual = 0.03
+n_iter = 2000000
+samples_per_pair = 10  # SGDA: fresh next-state samples per (u, s) pair and iteration
+avg_window = 100000    # tail average over the last 100,000 iterates
+
+[K11T30]
+cases = ["CJS"]
+gda_seeds = [0]
+sgda_methods = ["D", "K11", "P2"]
+sgda_seeds = [0, 1, 2]
+
+[K11T30.hyper]
+Gamma_y = 1.0
+Gamma_lambda = 2e-5
+Gamma_mu = 2e-5
+eta_y = 0.8
+eta_dual = 0.02
+n_iter = 10000000
+samples_per_pair = 10
+avg_window = 100000
+
+[legacy]
+# Directory with the archived legacy arrays (outside the repository). Leave empty and set the environment
+# variable LPL_LEGACY_DIR instead; without either, the legacy comparisons are skipped.
+root = ""
+K5T10 = "policies_questa_K5T10"
+K11T30 = "policies_questa_K11T30"
+
+[smoke.K5T10]
+gda_seeds = [0, 1]
+sgda_seeds = [0, 1]
+
+[smoke.K5T10.hyper]
+n_iter = 20000
+
+[smoke.K11T30]
+gda_seeds = [0]
+sgda_seeds = [0, 1]
+
+[smoke.K11T30.hyper]
+n_iter = 20000

@@ -1,0 +1,33 @@
+# Deterministic reference solutions (stage lp_solutions). Per instance, case and partition:
+#   kind "lp"     method (A): unregularized LP (interior point, CLARABEL)
+#   kind "lp_reg" method (B): LP with Gamma_y/2 ||y||^2 and hard constraints (interior point)
+#   kind "saddle" exact fixed point of the regularized operator G, i.e. the target of GDA and SGDA
+# A partition other than "none" gives the aggregate problem, lifted to the detailed grid.
+# Hyperparameter defaults: lplearn/experiments/methods.py (LEARNER_DEFAULTS). Keep Gamma_* equal to configs/learners.toml.
+#
+#   lplearn experiments run lp_solutions --config configs/lp_solutions.toml --workers 2
+#   lplearn experiments run lp_solutions --config configs/lp_solutions.toml --smoke --workers 2
+#   lplearn experiments summarize lp_solutions --config configs/lp_solutions.toml
+
+kinds = ["lp", "lp_reg", "saddle"]
+k11_sjs = false  # also solve the SJS case of K11T30 (optional, off by default)
+
+# Manuscript convention Gamma/2 ||.||^2 (legacy runs used 0.5 and 1e-5 in the legacy convention Gamma ||.||^2).
+Gamma_y = 1.0
+Gamma_lambda = 2e-5
+Gamma_mu = 2e-5
+
+[K5T10]
+cases = ["CJS", "SJS"]
+partitions = ["none", "E", "F", "G", "H", "I", "J", "K"]
+
+[K11T30]
+cases = ["CJS"]
+partitions = ["none", "K11", "P2"]
+
+[smoke.K5T10]
+cases = ["CJS"]
+partitions = ["none", "E", "K"]
+
+[smoke.K11T30]
+partitions = ["none"]
