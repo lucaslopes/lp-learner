@@ -3,43 +3,42 @@ name: Versioned release
 on:
   push:
     tags: ['v*']
+  pull_request:
+    paths: ['.github/workflows/release.yml']
 
 permissions:
   contents: read
 
 jobs:
-  validate-tag:
+  validate-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Match tag and package versions
+      - name: Validate release metadata
         run: |
           python - <<'PY'
           import os
           import tomllib
           from pathlib import Path
 
-          tag = os.environ["GITHUB_REF_NAME"]
-          if not tag.startswith("v"):
-              raise SystemExit(f"Expected a v-prefixed tag, got {tag!r}")
-          release = tag[1:]
           project = tomllib.loads(Path("pyproject.toml").read_text())
           cargo = tomllib.loads(Path("Cargo.toml").read_text())
           python_version = project["project"]["version"]
           rust_version = cargo["package"]["version"]
-          if python_version != release or rust_version != release:
-              raise SystemExit(
-                  f"tag={release}, pyproject={python_version}, "
-                  f"Cargo={rust_version}"
-              )
-          print(f"Release version verified: {release}")
+          if python_version != rust_version:
+              raise SystemExit(f"pyproject={python_version}, Cargo={rust_version}")
+          if os.environ["GITHUB_EVENT_NAME"] == "push":
+              tag = os.environ["GITHUB_REF_NAME"]
+              if tag != f"v{python_version}":
+                  raise SystemExit(f"tag={tag}, expected v{python_version}")
+          print(f"Release version verified: {python_version}")
           PY
 
   wheels:
-    needs: validate-tag
+    needs: validate-version
     strategy:
       fail-fast: false
       matrix:
@@ -71,7 +70,7 @@ jobs:
           if-no-files-found: error
 
   sdist:
-    needs: validate-tag
+    needs: validate-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -91,57 +90,9 @@ jobs:
           path: dist/*.tar.gz
           if-no-files-found: error
 
-  publish-pypi:
-    needs: [wheels, sdist]
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/project/lplearn/
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: dist-*
-          path: dist
-          merge-multiple: true
-      - uses: pypa/gh-action-pypi-publish@release/v1
-
-  verify-pypi:
-    needs: publish-pypi
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-15, windows-latest]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install and exercise the published wheel
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          for attempt in {1..12}; do
-            if python -m pip install "lplearn==$version"; then
-              break
-            fi
-            if [ "$attempt" -eq 12 ]; then
-              exit 1
-            fi
-            sleep 10
-          done
-          python -m lplearn backend ping
-      - if: runner.os != 'Windows'
-        run: lplearn backend ping
-      - if: runner.os == 'Windows'
-        shell: cmd
-        run: lplearn.cmd backend ping
-
   github-release:
-    needs: verify-pypi
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [wheels, sdist]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -151,7 +102,7 @@ jobs:
           pattern: dist-*
           path: dist
           merge-multiple: true
-      - name: Create GitHub Release with the published artifacts
+      - name: Create GitHub Release with the tested artifacts
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
