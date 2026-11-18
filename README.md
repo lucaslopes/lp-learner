@@ -10,8 +10,9 @@ restores the legacy `Model` and top-level API exports; `0.7.0` adds the
 resumable experiment runner and smoke stage; `0.8.0` adds LP-reference and
 learning experiment stages; `0.9.0` adds aggregation bounds, `0.10.0` adds
 finite-population experiments, `0.11.0` adds commons, and `0.12.0` adds
-manuscript tables, figures, tutorial assets and web data export. Planned
-`0.13.0` qualifies dependency and release support across the target matrix. See
+manuscript tables, figures, tutorial assets and web data export. `0.13.0`
+qualifies dependency and release support across the target matrix. `1.0.0`
+adds a public Rust online API for application-owned queue decisions. See
 [the single-job workflow and policy plots](docs/python-baseline.md).
 For reproducible CLI timing and policy comparisons, see the
 [benchmark protocol](docs/benchmark-protocol.md).
@@ -34,3 +35,11 @@ Eshwar was supported by the Prime Minister’s Research Fellowship (PMRF). G. Th
 
 ## Paper
 For the most updated version of our paper, please click [here](https://arxiv.org/abs/2406.14141).
+
+## Rust online API
+
+The library includes an observation-driven queue-learning API for native Rust
+and WebAssembly consumers. The caller records the transition that actually
+executed; optimizer iterations remain separate from environment observations.
+See the [online queue API guide](docs/online-queue-api.md). The learner does
+not enforce application admission, service, safety, or withdrawal constraints.

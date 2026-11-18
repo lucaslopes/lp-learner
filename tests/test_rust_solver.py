@@ -1,6 +1,7 @@
 """Compare installed Rust and Numba GDA/SGDA, including the CLI boundary."""
 
 import json
+from importlib import metadata as importlib_metadata
 from pathlib import Path
 import subprocess
 import sys
@@ -61,7 +62,7 @@ class RustSolverTests(unittest.TestCase):
                         metadata = json.loads(str(data["metadata_json"]))
                         self.assertEqual(metadata["backend"], backend)
                         if backend == "rust":
-                            self.assertEqual(metadata["backend_version"], "0.13.0")
+                            self.assertEqual(metadata["backend_version"], importlib_metadata.version("lplearn"))
                             self.assertIs(metadata["backend_debug_assertions"], False)
                             self.assertGreaterEqual(metadata["backend_process_seconds"],
                                                     metadata["solver_reported_seconds"])
