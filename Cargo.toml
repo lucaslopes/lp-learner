@@ -3,6 +3,8 @@ name = "lplearn"
 version = "1.0.0"
 edition = "2021"
 license = "GPL-3.0-or-later"
+description = "Rust library and Python CLI for linear programming learning with primal-dual gradient methods."
+repository = "https://github.com/lucaslopes/lplearn"
 [lib]
 name = "lp_learner"
 path = "src/lib.rs"
