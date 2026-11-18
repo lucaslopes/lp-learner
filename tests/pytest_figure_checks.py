@@ -445,7 +445,10 @@ def test_stage_run_then_summarize_redraws_from_results(tmp_path: Path, rng, thre
     results, out = tmp_path / 'results', tmp_path / 'figures'
     write_finite_n(results / 'finite_n' / 'finite_n_summary.csv')
     mapping = {'results_root': str(results), 'out_dir': str(out), 'figures': ['finite_n_costs']}
-    report = runner.run_stage('figures', mapping, results_root=tmp_path / 'stage-results', workers=1)
+    # This checks the stage's process-pool and result plumbing, not the host's
+    # available-memory policy. CI hosts can report less than the production
+    # 4 GiB default and would then wait forever in wait_for_memory().
+    report = runner.run_stage('figures', mapping, results_root=tmp_path / 'stage-results', workers=1, min_free_gb=0)
     assert report.status == 'ok'
     summary = runner.summarize_stage('figures', mapping, results_root=tmp_path / 'stage-results', out_dir=tmp_path / 'summary')
     assert_embedded_pdf(out / 'finite_n_costs.pdf')
