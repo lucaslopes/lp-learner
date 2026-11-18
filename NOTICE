@@ -46,3 +46,8 @@ The aggregation-bound analysis, experiment stage and its TOML configuration
 are adapted from the corresponding Python reference paths at commit
 c23e6007400daae28737f91d19205233d313d043 under GPL-3.0-or-later. Imports and
 CLI examples were updated for the lplearn namespace.
+
+The finite_n policies, mechanisms, simulator, experiment stage and TOML
+configurations are adapted from the corresponding Python reference paths at
+the commit above, under GPL-3.0-or-later. Imports, stage version and learned
+occupation diagnostics were adapted.

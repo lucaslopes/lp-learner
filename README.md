@@ -20,6 +20,8 @@ the experiment runner.
 
 Version `0.9.0` adds the state-aggregation bound experiment.
 
+Version `0.10.0` adds finite-population policy simulation.
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe

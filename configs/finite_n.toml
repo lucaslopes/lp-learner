@@ -1,0 +1,42 @@
+# Finite-N evaluation of feasible N-queue policies built from the LP occupation measures (stage `finite_n`).
+# Method and policy definitions: reports/finite_n/README.md.
+#
+#   lplearn experiments run finite_n --config configs/finite_n.toml --workers 8
+#   lplearn experiments summarize finite_n --config configs/finite_n.toml
+#   lplearn experiments run finite_n --config configs/finite_n.toml --smoke --workers 2   # smoke, results/smoke/
+#
+# Instance: Section 8 defaults (QueueParams defaults: p = 0.7, alpha = 0.75, beta = 0.25, gamma = gamma_bar = 100)
+# with K = 5 and T = 10. Costs and LP values are sums over the T stages, per arm.
+K = 5
+T = 10
+cases = ["CJS", "SJS"]
+
+# A, B: LP and regularized LP on the detailed grid. C, D: GDA and SGDA on the detailed grid.
+# E..K: SGDA on the aggregate partitions of Table tab:methods. E-LP..K-LP: unregularized LP on those partitions.
+methods = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "E-LP", "F-LP", "G-LP", "H-LP", "I-LP", "J-LP", "K-LP"]
+# Closed-loop LP re-solve: LP-based methods only.
+lp_update_methods = ["A", "E-LP", "F-LP", "G-LP", "H-LP", "I-LP", "J-LP", "K-LP"]
+# Uncoordinated diagnostic (Unenforced): arms sample pi independently.
+independent_methods = ["A"]
+
+# Source of the saddle-based policies (C..K): "exact_saddle" = fixed point of G (what GDA/SGDA converge to),
+# or "learned" = the y_avg of the learners stage at learned_file for case/method/seed<learned_seed>.
+# The learners stage writes its consolidated file into its summary directory (default results/learners/summary/).
+saddle_source = "learned"
+learned_file = "results/learners/summary/solutions_K5T10.npz"
+learned_seeds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # policies of C..K: one per learned seed; costs averaged over seeds per replication,
+# intervals for these rows are taken across seeds (cost_ci95_seed)
+
+N_values = [10, 100, 1000]
+n_chunks = 10          # replication chunks, rep_offset = chunk * reps_per_chunk
+reps_per_chunk = 200
+seed = 20261008        # shared by all jobs, so replications are paired across methods (common random numbers)
+
+[smoke]
+saddle_source = "exact_saddle"
+N_values = [10, 100]
+n_chunks = 2
+reps_per_chunk = 20
+methods = ["A", "B", "C", "G", "G-LP", "K-LP"]
+lp_update_methods = ["A", "G-LP"]
+independent_methods = ["A"]
