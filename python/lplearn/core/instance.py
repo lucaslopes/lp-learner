@@ -1,7 +1,7 @@
 '''
 Load-balancing and auto-scaling instance of a finite-horizon weakly coupled MDP.
 
-Conventions shared by the whole ``lp_learner.core`` package:
+Conventions shared by the whole ``lplearn.core`` package:
 
 - states ``s = 0, ..., K`` (queue length), so ``S = K + 1``;
 - actions ``u = 2a + b`` with ``a`` = admit and ``b`` = high service rate,
