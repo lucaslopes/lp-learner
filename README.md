@@ -2,10 +2,12 @@
 
 `lplearn` provides a Python API and CLI for single-configuration policy
 solves with CVXPY, Numba, or a packaged Rust backend.
-Version `0.4.0` adds `lplearn plot-policy` with feasibility checks and optional
-recovery. See the [bridge guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md)
-and [policy plot examples](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md)
-for installation and use.
+Version `0.5.0` adds reproducible comparisons of the full policy plot
+workflow, with matched Numba and Rust learner settings and optional
+feasibility recovery. See the
+[bridge guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md),
+[policy plot examples](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md),
+and [benchmark protocol](https://github.com/lucaslopes/lplearn/blob/main/docs/benchmark-protocol.md).
 
 ## Authors
 - S.R. Eshwar
