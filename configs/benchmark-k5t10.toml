@@ -1,0 +1,18 @@
+# Bounded timing workload, not a convergence or manuscript reproduction claim.
+[model]
+K = 5
+T = 10
+case = "CJS"
+
+[learning]
+Gamma_y = 1.0
+Gamma_lambda = 0.00002
+Gamma_mu = 0.00002
+eta_y = 0.9
+eta_dual = 0.03
+n_iter = 1000
+samples_per_pair = 10
+seed = 0
+avg_window = 100
+record_every = 100
+init = "uniform"
