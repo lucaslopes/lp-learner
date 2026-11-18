@@ -26,7 +26,7 @@ fn execute() -> Result<(), Box<dyn std::error::Error>> {
             "command": request.command,
             "backend": "rust",
             "version": env!("CARGO_PKG_VERSION"),
-            "capabilities": [],
+            "capabilities": ["gda", "sgda"],
         })
     );
     Ok(())

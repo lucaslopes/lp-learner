@@ -5,3 +5,9 @@ S. R. Eshwar, Lucas Lopes Felipe, Alexandre Reiffers-Masson,
 Daniel Sadoc Menasche and Gugan Thoppe, and is distributed under
 GPL-3.0-or-later; see LICENSE. The legacy-only kernel helper was removed,
 and the modules have moved to the lplearn namespace.
+
+The Rust model and solver under src/model and src/solver, and src/error.rs,
+are adapted from lp-learner-private commit
+13529bb1235ab9a365b37689c9c30466726d5b7e, GPL-3.0-or-later. Their numerical
+conventions are based on lp_learner/core/instance.py and gda.py at the Python
+reference commit above. serde and serde_json are licensed MIT OR Apache-2.0.

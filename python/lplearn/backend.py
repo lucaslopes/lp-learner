@@ -46,7 +46,7 @@ def _request(command: str, *, timeout: float = 30.0) -> dict:
         raise BackendError("Rust backend returned invalid JSON") from error
     if (not isinstance(response, dict) or response.get("schema") != SCHEMA
             or response.get("command") != command or response.get("backend") != "rust"
-            or not isinstance(response.get("version"), str) or response.get("capabilities") != []):
+            or not isinstance(response.get("version"), str) or response.get("capabilities") != ["gda", "sgda"]):
         raise BackendError("Rust backend returned an incompatible response")
     return response
 

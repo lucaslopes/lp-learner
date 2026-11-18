@@ -1,13 +1,21 @@
 [package]
 name = "lplearn"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "GPL-3.0-or-later"
 build = "build.rs"
 
+[lib]
+name = "lp_learner"
+path = "src/lib.rs"
+
 [[bin]]
 name = "lplearn-native"
 path = "src/main.rs"
+
+[[bin]]
+name = "lplearn-solver"
+path = "src/solver_cli.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

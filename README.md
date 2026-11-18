@@ -1,11 +1,11 @@
 # Online Learning of Weakly Coupled MDP Policies for Load Balancing and Auto Scaling
 
-`lplearn` 0.1.0 introduced a diagnostic bridge to a Rust backend and only
-reported its identity. Release 0.2.0 adds a Python API and CLI for
-single-configuration policy solves: CVXPY/CLARABEL for the direct LP and Numba
-for GDA/SGDA. See the [bridge guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md)
-and [Python baseline guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md)
-for installation, configuration and usage.
+`lplearn` provides a Python API and CLI for single-configuration policy solves.
+Version `0.3.0` runs GDA and SGDA through a packaged Rust backend. The same API
+also supports CVXPY/CLARABEL for the direct LP and Numba for GDA and SGDA.
+See the [bridge guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-rust-bridge.md)
+and [single-job guide](https://github.com/lucaslopes/lplearn/blob/main/docs/python-baseline.md)
+for installation and use.
 
 ## Authors
 - S.R. Eshwar

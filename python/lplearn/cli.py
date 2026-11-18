@@ -19,7 +19,9 @@ def main(argv=None) -> int:
     solve = commands.add_parser("solve", help="solve a single configured queue model")
     solve.add_argument("--config", required=True, help="TOML configuration file")
     solve.add_argument("--method", required=True, choices=("lp", "gda", "sgda"))
-    solve.add_argument("--backend", required=True, choices=("cvxpy", "numba"))
+    solve.add_argument("--backend", required=True, choices=("cvxpy", "numba", "rust"))
+    solve.add_argument("--rust-timeout", type=float, default=30.0,
+                       help="Rust solver timeout in seconds (default: 30)")
     solve.add_argument("--output", required=True, help="output .npz file")
     args = parser.parse_args(argv)
     try:
@@ -41,7 +43,7 @@ def _solve(args):
     if output.suffix.lower() != ".npz":
         raise ValueError("output must end in .npz")
     config = load_config(args.config)
-    occupation, metadata = solve(config, args.method, args.backend)
+    occupation, metadata = solve(config, args.method, args.backend, rust_timeout=args.rust_timeout)
     output.parent.mkdir(parents=True, exist_ok=True)
     config_json = json.dumps(config, allow_nan=False)
     metadata_json = json.dumps(metadata, allow_nan=False)
