@@ -33,3 +33,11 @@ The experiment runner and smoke stage in python/lplearn/experiments, together
 with configs/smoke.toml, are adapted from the corresponding paths at the same
 Python reference commit, under GPL-3.0-or-later. Imports, packaging, provenance,
 Windows peak-RSS handling and pickle-free NumPy archive writing were adapted.
+
+The aggregation, policy and saddle core modules, analysis metrics,
+lp_solutions/learners experiment stages and their TOML configurations are
+adapted from the corresponding Python reference paths at the commit above,
+under GPL-3.0-or-later. Imports and learner non-finite checks were adapted.
+
+The learners stage additionally dispatches to the Rust solver, records backend
+identity and occupation diagnostics, and uses a new stage cache version.

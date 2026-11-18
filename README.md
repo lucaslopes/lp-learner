@@ -15,6 +15,9 @@ Version `0.6.0` restores the legacy `Model` and top-level API exports. See the
 Version `0.7.0` adds a resumable experiment runner and a smoke stage. See the
 [experiment guide](https://github.com/lucaslopes/lplearn/blob/main/docs/experiments.md).
 
+Version `0.8.0` adds CVXPY reference and Numba or Rust learning stages to
+the experiment runner.
+
 ## Authors
 - S.R. Eshwar
 - Lucas Lopes Felipe

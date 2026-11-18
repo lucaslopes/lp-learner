@@ -14,10 +14,28 @@ lplearn experiments summarize smoke --config configs/smoke.toml --results-dir /t
 ```
 
 The included `smoke` stage solves small random matrix eigenproblems to exercise
-the runner. It is not a queue-policy experiment. The original stage names are
-listed to make the gap visible, but only `smoke` is included in this change;
-the LP, learning, bound, finite-population, commons and paper stages must be
-ported separately before they can run. Selecting one returns a clear error.
+the runner. It is not a queue-policy experiment. The `lp_solutions` and
+`learners` stages reproduce the reference experiment grids using Python CVXPY
+and either Numba or the packaged Rust backend, respectively. Set
+`backend = "rust"` in the learners configuration; the default is `"numba"`.
+`rust_timeout` sets the worker timeout per job (default 3600 s). Job IDs include the stage version, selected backend, and the installed Numba
+version or Rust worker SHA-256. These fields keep results from different
+backends and worker versions separate. Use separate summary
+output directories for the two backends. Rust failures mark jobs failed and
+never silently fall back to Numba. Both backends retain the same seeds and
+state-aggregation weights. Each learner record includes the raw occupation
+minimum, flow/budget/nonnegativity violations, backend identity and timing
+scope; short runs can be infeasible and these diagnostics do not establish
+policy feasibility.
+
+The original names of the remaining stages are listed to make the gap visible;
+bound, finite-population, commons and paper stages must be ported separately
+before they can run. Selecting one returns a clear error.
+
+The shipped `configs/learners.toml` describes a large research grid, including
+millions of iterations per job. Inspect its parameters and use a deliberately
+small separate configuration before running an exploratory test. Do not assume
+that selecting `--smoke` makes the reference workload trivial.
 
 The runner defaults to a 4 GiB free-memory threshold and may wait for memory.
 `--dry-run`, `--force`, `--only`, and `--smoke` retain their reference meanings.
